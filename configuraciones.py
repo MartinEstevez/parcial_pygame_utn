@@ -1,0 +1,35 @@
+# configuraciones.py
+
+# DIMENSIONES
+ANCHO_PANTALLA = 800
+ALTO_PANTALLA = 600
+
+# COLORES
+COLOR_TEXTO = (230, 230, 230)
+COLOR_FONDO_BOTON = (20, 60, 140)
+COLOR_BORDE_TIMER = (0, 156, 222)
+
+# FUENTES
+TAM_FUENTE_TITULO = 64
+TAM_FUENTE_BOTON = 32
+TAM_FUENTE_DES = 24
+TAM_FUENTE_TIMER = 36
+TAM_FUENTE_PREGUNTA = 30
+
+# RUTAS
+RUTA_IMAGEN_MENU = "img\\menu.png"
+RUTA_IMAGEN_FONDO_JUEGO = "img\\fondo.png"
+RUTA_FAVICON = "img\\favicon.png"
+RUTA_MUSICA_MENU = "music\\menu_principal.mp3"
+RUTA_ICONO_SONIDO_ON = "img\\sonido_on.png"
+RUTA_ICONO_SONIDO_OFF = "img\\sonido_off.png"
+RUTA_ICONO_RESET = "img\\reset.png"
+
+# TÍTULO
+TITULO_JUEGO = "¿Quién quiere ser millonario?"
+
+# BOTONES
+ANCHO_BOTON = 300
+ALTO_BOTON = 50
+ESPACIO_ENTRE_BOTONES = 20
+Y_BOTONES = 220
