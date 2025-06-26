@@ -80,4 +80,27 @@ def dibujar_reset(pantalla: pygame.Surface, icono_reset: pygame.Surface):
 
     pantalla.blit(icono_reset, pygame.Rect(x_img, y_img, ancho_img, alto_img))
 
+def dibujar_boton_volver(pantalla: pygame.Surface, fuente: pygame.font.Font):
+    rect_volver = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
+    dibujar_boton(pantalla, rect_volver, "VOLVER", fuente)
+    return rect_volver
+
+def dibujar_fondo_por_pantalla(pantalla: pygame.Surface, pantalla_actual: str):
+    """
+    Carga y dibuja el fondo correspondiente a la pantalla actual.
+    """
+    if pantalla_actual == "EN_JUEGO":
+        ruta = RUTA_IMAGEN_FONDO_JUEGO
+    elif pantalla_actual == "CONFIGURACIÓN":
+        ruta = RUTA_IMAGEN_FONDO_CONFIG
+    elif pantalla_actual == "PUNTAJES":
+        ruta = RUTA_IMAGEN_FONDO_PUNTAJES
+    else:
+        ruta = RUTA_IMAGEN_MENU
+
+    fondo = pygame.transform.scale(pygame.image.load(ruta), (ANCHO_PANTALLA, ALTO_PANTALLA))
+    pantalla.blit(fondo, (0, 0))
+
+
+
 
