@@ -136,3 +136,155 @@ def cambiar_pregunta(lista_diccionarios:list[dict], lista_indices:list, minimo:i
 
     nueva_pregunta = lista_diccionarios[nuevo_indice]
     return nueva_pregunta                
+
+# ------------------------------------------- FUNCIONES NICOLÁS -------------------------------------------
+
+def leer_archivo(ruta:str) -> str | None:
+    """
+    Lee el archivo si existe , si no existe lo crea vacio 
+    """
+    try: 
+        with open(ruta, "r") as archivo:
+            datos = archivo.read()
+            
+    except:
+        archivo = open(ruta, "w")
+        archivo.close()
+        datos = None
+    return datos
+
+
+
+def mostrar_lista_diccionarios(lista_diccionarios:list[dict]) -> None:
+    """
+    """
+    espacios_reservados = medir_clave_mas_larga(lista_diccionarios[0].keys()) + 5
+    # espacios_reservados = 12
+
+    imprimir_encabezado(lista_diccionarios[0].keys(), espacios_reservados)
+
+    for i in range(len(lista_diccionarios)):
+        contador = 0
+        for clave in lista_diccionarios[i].keys():
+            contador += 1
+            if contador < len(lista_diccionarios[i].keys()):
+                print(f"{lista_diccionarios[i][clave]:<{espacios_reservados}}", end=" | ")
+
+            else:
+                print(f"{lista_diccionarios[i][clave]:<{espacios_reservados}}")
+
+def imprimir_encabezado(claves_diccionario:list, espacios_reservados:int) -> None:
+    """
+
+    """
+    contador = 0
+    for clave in claves_diccionario:
+        contador += 1
+        clave_capitalize = f"{clave}".capitalize()
+        
+        if contador < len(claves_diccionario):
+            print(f"{clave_capitalize:^{espacios_reservados}}", end=" | ")
+
+        else:
+            print(f"{clave_capitalize:^{espacios_reservados}}")
+
+
+def medir_clave_mas_larga(claves_diccionario:list) -> int:
+    """
+    """
+    clave_mas_larga = None
+
+    for clave in claves_diccionario:
+        if clave_mas_larga == None:
+            clave_mas_larga = len(clave)
+
+        else:
+
+            if len(clave) > clave_mas_larga:
+                clave_mas_larga = len(clave)
+
+    return clave_mas_larga
+
+def cargar_datos(datos:str) -> list[dict]:
+    """
+    Modifica el texto del CSV en una lista de diccionarios (uno por jugador).
+    """
+    print(datos)
+    lista_retorno = []
+    if datos != "":
+        lista_strings = datos.strip().split("\n") 
+        # strip(): Limpia los espacios vacíos del principio y final del string.
+        # split(): Separa un string en una lista de elementos, por el separador ingresado por parámetro.
+
+        for i in range(len(lista_strings)):
+            if i == 0:
+                lista_claves = lista_strings[i].split(",")
+
+            else:
+                lista_valores = lista_strings[i].split(",")
+                nombre = {}
+                for j in range(len(lista_claves)):
+                    nombre.update({lista_claves[j]: lista_valores[j]})
+
+                lista_retorno.append(nombre)
+    return lista_retorno
+
+def formatear_alumnos(lista_diccionarios:list[dict]) -> str:
+    """
+    Modifica la lista de jugadores en un string csv para guardarlo.
+    """
+    retorno = ""
+    
+    if len(lista_diccionarios) > 0:
+        retorno += ",".join(lista_diccionarios[0].keys()) + "\n"
+        for i in range(len(lista_diccionarios)):
+            retorno += ",".join(lista_diccionarios[i].values()) + "\n" # Se invoca desde un separador y recibe una lista, la cual une utilizando el separador.
+    return retorno
+
+
+def actualizar_ranking(nombre:str, nuevo_puntaje:int, ruta:str) -> None:
+    """
+    Actualiza el ranking guardando solo el mejor puntaje de cada jugador.
+    """
+    datos_csv = leer_archivo(ruta)
+
+    if datos_csv is None or datos_csv.strip() == "":
+        lista_ranking = []
+    else:
+        lista_ranking = cargar_datos(datos_csv)
+    
+    encontrado = False # busca si existe el jugador 
+    for jugador in lista_ranking:
+        if jugador["nombre"] == nombre:
+            encontrado = True
+            if int(jugador["puntaje"]) < nuevo_puntaje:
+                jugador["puntaje"] = str(nuevo_puntaje)
+            break
+
+    if not encontrado:
+        nuevo_jugador = {"nombre": nombre, "puntaje": str(nuevo_puntaje)}
+        lista_ranking.append(nuevo_jugador)
+
+    datos_actualizados = formatear_alumnos(lista_ranking)
+    guardar_archivo(ruta, "w", datos_actualizados)
+
+
+def guardar_archivo(ruta:str, modo:str, datos:str) -> None:
+    """
+    Guarda el archivo
+    """
+    with open(ruta, modo) as archivo:
+        archivo.write(datos)
+
+def ordenar_diccionarios(lista_diccionarios:list[dict], clave:str, descendente:str = False):
+    """
+    Ordena una lista de diccionarios, por la clave y criterio.
+    """
+    for i in range(len(lista_diccionarios) - 1):
+        for j in range(i + 1, len(lista_diccionarios)):
+            if (descendente == False and lista_diccionarios[i][clave] > lista_diccionarios[j][clave]) or (descendente == True and lista_diccionarios[i][clave] < lista_diccionarios[j][clave]):
+                aux = lista_diccionarios[i]
+                lista_diccionarios[i] = lista_diccionarios[j]
+                lista_diccionarios[j] = aux
+
+#def calcular_puntaje(contador: int, tiempo_respuesta: float) -> int:
