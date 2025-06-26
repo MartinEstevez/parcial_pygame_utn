@@ -14,7 +14,7 @@ TAM_FUENTE_TITULO = 64
 TAM_FUENTE_BOTON = 32
 TAM_FUENTE_DES = 24
 TAM_FUENTE_TIMER = 36
-TAM_FUENTE_PREGUNTA = 30
+TAM_FUENTE_PREGUNTA = 20
 
 # RUTAS
 RUTA_IMAGEN_MENU = "img\\menu.png"
@@ -24,6 +24,8 @@ RUTA_MUSICA_MENU = "music\\menu_principal.mp3"
 RUTA_ICONO_SONIDO_ON = "img\\sonido_on.png"
 RUTA_ICONO_SONIDO_OFF = "img\\sonido_off.png"
 RUTA_ICONO_RESET = "img\\reset.png"
+RUTA_IMAGEN_FONDO_CONFIG = "img\\fondo_config.png"
+RUTA_IMAGEN_FONDO_PUNTAJES = "img\\fondo_puntajes.png"
 
 # TÍTULO
 TITULO_JUEGO = "¿Quién quiere ser millonario?"

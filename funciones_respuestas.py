@@ -74,17 +74,17 @@ def mostrar_pregunta(diccionario:dict, clave:str) -> None:
     """
     print(diccionario[clave])
 
-def mostrar_respuestas_aleatorias(diccionario:dict) -> None:
-    """
+""" def mostrar_respuestas_aleatorias(diccionario:dict) -> None:
+    
     Muestra las respuestas de cada diccionario.
 
     Recibe:
         - diccionario (dict): diccionario de donde se van a mostrar las respuestas.
-    """
+    
     indices = crear_lista_indices_random(4, 1, 4)
 
     for i in range(len(indices)):
-        print(f"{chr(97 + i)}) {diccionario[f'r_{indices[i]}']}")
+        print(f"{chr(97 + i)}) {diccionario[f'r_{indices[i]}']}") """
 
 
 def comprobar_respuesta(diccionario:dict, respuesta:str, clave:str) -> bool:
@@ -135,6 +135,7 @@ def cambiar_pregunta(lista_diccionarios:list[dict], lista_indices:list, minimo:i
         nuevo_indice = random.randint(minimo, maximo)
 
     nueva_pregunta = lista_diccionarios[nuevo_indice]
+<<<<<<< HEAD
     return nueva_pregunta                
 
 # ------------------------------------------- FUNCIONES NICOLÁS -------------------------------------------
@@ -288,3 +289,20 @@ def ordenar_diccionarios(lista_diccionarios:list[dict], clave:str, descendente:s
                 lista_diccionarios[j] = aux
 
 #def calcular_puntaje(contador: int, tiempo_respuesta: float) -> int:
+=======
+    return nueva_pregunta
+
+def obtener_respuestas(pregunta: dict) -> list:
+    indices = crear_lista_indices_random(4, 1, 4)
+    respuestas = []
+    for i in range(len(indices)):
+        respuestas.append(pregunta[f"r_{indices[i]}"])
+    return respuestas
+
+
+
+
+
+
+
+>>>>>>> 639b24642d8774f835d17d2c84e0055ab3f469b1
