@@ -50,62 +50,71 @@ respuesta_correcta = ""
 botones_respuesta = []
 respuestas_correctas = 0
 
+# Comodines
+nombres_comodines = ["50/50", "CAMBIAR"]
+botones_comodines = []
+comodin_oculto = False
+
 corriendo = True
 
-while corriendo:
+while corriendo: # BUCLE PRINCIPAL
 
-    for evento in pygame.event.get():
+    for evento in pygame.event.get(): # EVENTO PARA CERRAR
         if evento.type == pygame.QUIT:
             corriendo = False
 
-        if evento.type == evento_tick:
+        if evento.type == evento_tick: # EVENTO PARA EL TIMER
             if pantalla_actual == "EN_JUEGO":
                 segundos += 1
 
-        if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
-            mouse_pos = pygame.mouse.get_pos()
+        if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1: # EVENTO PARA CLICK IZQUIERDO
+            mouse_pos = pygame.mouse.get_pos() # Obtener la posición del mouse
 
-            if rect_icono_sonido.collidepoint(mouse_pos):
+            if rect_icono_sonido.collidepoint(mouse_pos): # Si se hace click en el icono de sonido
                 if musica_activa == True:
                     musica_activa = False
-                    pygame.mixer.music.set_volume(0.0)
+                    pygame.mixer.music.set_volume(0.0) # Silenciar música
                 else:
                     musica_activa = True
-                    pygame.mixer.music.set_volume(0.5)
+                    pygame.mixer.music.set_volume(0.5) # Reanudar música
 
-            if pantalla_actual == "MENU":
+            if pantalla_actual == "MENU": # Pantalla del menú
 
                 x = (ANCHO_PANTALLA - ANCHO_BOTON) / 2
 
-                for i in range(len(botones_menu)):
+                for i in range(len(botones_menu)): # Iterar sobre los botones del menú
 
                     y = Y_BOTONES + i * (ALTO_BOTON + ESPACIO_ENTRE_BOTONES)
 
                     if pygame.Rect(x, y, ANCHO_BOTON, ALTO_BOTON).collidepoint(mouse_pos):
 
-                        if botones_menu[i] == "SALIR":
+                        if botones_menu[i] == "SALIR": # Salir del juego
                             corriendo = False
 
-                        elif botones_menu[i] == "JUGAR":
+                        elif botones_menu[i] == "JUGAR": # Iniciar el juego
                             pantalla_actual = "EN_JUEGO"
-                            segundos = 0
-                            respuestas_correctas = 0
-                            preguntas_respondidas = 0
-                            lista_preguntas = leer_archivo_json("datos.json")
-                            indices_preguntas = crear_lista_indices_random(10, 0, len(lista_preguntas) - 1)
-                            pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
-                            respuestas_actuales = obtener_respuestas(pregunta_actual)
-                            respuesta_correcta = (lambda d, c: d[c])(pregunta_actual, "correcta")
+                            segundos = 0 # Reiniciar el timer
+                            respuestas_correctas = 0 # Reiniciar el contador de respuestas correctas
+                            preguntas_respondidas = 0 # Reiniciar el contador de preguntas respondidas
+                            lista_preguntas = leer_archivo_json("datos.json") # Cargar las preguntas del archivo JSON
+                            indices_preguntas = crear_lista_indices_random(10, 0, len(lista_preguntas) - 1) # Crear una lista de índices aleatorios para las preguntas
+                            pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]] # Obtener la primera pregunta
+                            respuestas_actuales = obtener_respuestas(pregunta_actual) # Obtener las respuestas de la pregunta actual
+                            respuesta_correcta = (lambda d, c: d[c])(pregunta_actual, "correcta") # Obtener la respuesta correcta de la pregunta actual
 
                             
                         elif botones_menu[i] == "CONFIGURACIÓN":
                             pantalla_actual = "CONFIGURACIÓN"
 
             elif pantalla_actual == "CONFIGURACIÓN":
+
                 x = (ANCHO_PANTALLA - ANCHO_BOTON) / 2
+                
                 for i in range(len(botones_configuracion)):
                     y = Y_BOTONES + i * (ALTO_BOTON + ESPACIO_ENTRE_BOTONES)
+                    
                     if pygame.Rect(x, y, ANCHO_BOTON, ALTO_BOTON).collidepoint(mouse_pos):
+                        
                         if botones_configuracion[i] == "VOLVER":
                             pantalla_actual = "MENU"
             
@@ -119,21 +128,26 @@ while corriendo:
                 if pygame.Rect(10, 10, 45, 45).collidepoint(mouse_pos):
                     segundos = 0
 
-                for i in range(len(botones_respuesta)):
+                for i in range(len(botones_respuesta)): # Iterar sobre los botones de respuesta
+                    
                     if botones_respuesta[i].collidepoint(mouse_pos):
-                        seleccion = respuestas_actuales[i]
-                        if seleccion == respuesta_correcta:
-                            respuestas_correctas += 1
-                        preguntas_respondidas += 1
-                        if preguntas_respondidas < 10:
-                            pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
-                            respuestas_actuales = obtener_respuestas(pregunta_actual)
-                            respuesta_correcta = (lambda d, c: d[c])(pregunta_actual, "correcta")
+                        seleccion = respuestas_actuales[i] # Obtener la respuesta seleccionada
+
+                        if seleccion == respuesta_correcta: # Si la respuesta es correcta
+                            botones_respuesta[i] = dibujar_boton(pantalla, botones_respuesta[i], seleccion, fuente_boton, (0, 255, 0)) # Dibujar el botón de respuesta correcta en verde
+                            respuestas_correctas += 1 # Incrementar el contador de respuestas correctas
+                        preguntas_respondidas += 1 # Incrementar el contador de preguntas respondidas
+                        
+                        if preguntas_respondidas < 10: # Si aún hay preguntas por responder
+                            pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]] # Obtener la siguiente pregunta
+                            respuestas_actuales = obtener_respuestas(pregunta_actual) # Obtener las respuestas de la nueva pregunta
+                            respuesta_correcta = (lambda d, c: d[c])(pregunta_actual, "correcta") # Obtener la respuesta correcta de la nueva pregunta
                         else:
-                            pantalla_actual = "JUEGO_TERMINADO"
+                            pantalla_actual = "JUEGO_TERMINADO" # Si se han respondido todas las preguntas, ir a la pantalla de juego terminado
 
             elif pantalla_actual == "JUEGO_TERMINADO":
                 volver_rect = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
+                
                 if volver_rect.collidepoint(mouse_pos):
                     pantalla_actual = "MENU"
 
