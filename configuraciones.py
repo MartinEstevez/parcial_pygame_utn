@@ -26,6 +26,8 @@ RUTA_ICONO_SONIDO_OFF = "img\\sonido_off.png"
 RUTA_ICONO_RESET = "img\\reset.png"
 RUTA_IMAGEN_FONDO_CONFIG = "img\\fondo_config.png"
 RUTA_IMAGEN_FONDO_PUNTAJES = "img\\fondo_puntajes.png"
+RUTA_IMAGEN_COMODIN_50_50 = "img\\comodin_50_50.png"
+RUTA_IMAGEN_COMODIN_CAMBIAR = "img\\comodin_cambiar.png"
 
 # TÍTULO
 TITULO_JUEGO = "¿Quién quiere ser millonario?"

@@ -101,6 +101,24 @@ def dibujar_fondo_por_pantalla(pantalla: pygame.Surface, pantalla_actual: str):
     fondo = pygame.transform.scale(pygame.image.load(ruta), (ANCHO_PANTALLA, ALTO_PANTALLA))
     pantalla.blit(fondo, (0, 0))
 
+def dibujar_comodines(pantalla: pygame.Surface, nombres: list, fuente: pygame.font.Font) -> list[pygame.Rect]:
+    """
+    Dibuja los botones de comodines centrados abajo y devuelve sus rectángulos.
+    """
+    botones = []
+    ancho_total = (ANCHO_BOTON * len(nombres)) + ESPACIO_ENTRE_BOTONES * (len(nombres) - 1)
+    x_inicial = (ANCHO_PANTALLA - ancho_total) / 2
+    y = ALTO_PANTALLA - 120
+
+    for i in range(len(nombres)):
+        x = x_inicial + i * (ANCHO_BOTON + ESPACIO_ENTRE_BOTONES)
+        rect = pygame.Rect(x, y, ANCHO_BOTON, ALTO_BOTON)
+        dibujar_boton(pantalla, rect, nombres[i], fuente)
+        botones.append(rect)
+
+    return botones
+
+
 
 
 

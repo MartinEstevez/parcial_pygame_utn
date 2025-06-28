@@ -114,16 +114,21 @@ def ocultar_respuestas(diccionario:dict, clave:str) -> list:
     Comodín de ocultar dos respuestas incorrectas aleatoriamente.
     """
     lista_indices = crear_lista_indices_random(4, 1, 4)
+    respuestas_filtradas = []
     respuestas_incorrectas = None
 
     for i in range(len(lista_indices)):
-        if diccionario[f"r_{lista_indices[i]}"] == diccionario[clave]:
-            print(diccionario[f"r_{lista_indices[i]}"])
+        respuesta_actual = diccionario[f"r_{lista_indices[i]}"]
+
+        if respuesta_actual == diccionario[clave]:
+            respuestas_filtradas.append(respuesta_actual)
 
         else:
-            if respuestas_incorrectas == None:
-                print(diccionario[f"r_{lista_indices[i]}"])
+            if respuestas_incorrectas is None:
+                respuestas_filtradas.append(respuesta_actual)
                 respuestas_incorrectas = True
+
+    return respuestas_filtradas
 
 # COMODÍN DE CAMBIAR PREGUNTA
 def cambiar_pregunta(lista_diccionarios:list[dict], lista_indices:list, minimo:int, maximo:int) -> dict:
@@ -135,7 +140,6 @@ def cambiar_pregunta(lista_diccionarios:list[dict], lista_indices:list, minimo:i
         nuevo_indice = random.randint(minimo, maximo)
 
     nueva_pregunta = lista_diccionarios[nuevo_indice]
-<<<<<<< HEAD
     return nueva_pregunta                
 
 # ------------------------------------------- FUNCIONES NICOLÁS -------------------------------------------
@@ -289,8 +293,6 @@ def ordenar_diccionarios(lista_diccionarios:list[dict], clave:str, descendente:s
                 lista_diccionarios[j] = aux
 
 #def calcular_puntaje(contador: int, tiempo_respuesta: float) -> int:
-=======
-    return nueva_pregunta
 
 def obtener_respuestas(pregunta: dict) -> list:
     indices = crear_lista_indices_random(4, 1, 4)
@@ -305,4 +307,3 @@ def obtener_respuestas(pregunta: dict) -> list:
 
 
 
->>>>>>> 639b24642d8774f835d17d2c84e0055ab3f469b1
