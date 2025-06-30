@@ -308,6 +308,30 @@ def obtener_respuestas(pregunta: dict) -> list:
         respuestas.append(pregunta[f"r_{indices[i]}"])
     return respuestas
 
+def calcular_puntaje(segundos:int , puntaje_base:int) -> int:
+    """
+    Calcula el puntaje basado en el tiempo de respuesta y el puntaje base.
+    
+    Recibe:
+        - segundos (int): tiempo de respuesta en segundos.
+        - puntaje_base (int): puntaje base del juego.
+        - puntaje_base (int): puntaje base del juego.
+
+    Devuelve:
+        - puntaje (int): puntaje calculado.
+    """
+
+    puntaje_total = None
+
+    
+
+    if segundos == 0:
+        puntaje_total = puntaje_base
+    else:
+        puntaje_total = puntaje_base // segundos
+
+    return puntaje_total
+
 
 
 

@@ -43,6 +43,7 @@ esperando_respuesta = False #
 tiempo_pausa = 0  #acumula en el que se pausa el juego
 
 
+
 pantalla_actual = "MENU"
 musica_activa = True
 
@@ -64,6 +65,14 @@ respuestas_correctas = 0
 nombres_comodines = ["50/50", "CAMBIAR"]
 botones_comodines = []
 comodin_oculto = False
+
+# Puntajes
+puntaje_total = 0
+puntaje_base = 100
+tiempo_total = 0
+
+
+
 
 corriendo = True
 
@@ -135,12 +144,20 @@ while corriendo:  # BUCLE PRINCIPAL
                             seleccion = respuestas_actuales[i] # Obtener la respuesta seleccionada
                             #aca boton de colores cuando es correcto 
                             if seleccion == respuesta_correcta: # Si la respuesta es correcta
+                                
                                 botones_respuesta[i] = dibujar_boton(pantalla, botones_respuesta[i], seleccion, fuente_boton, (0, 255, 0)) # Dibujar el botón de respuesta correcta en verde
+                                
                                 respuestas_correctas += 1 # Incrementar el contador de respuestas correctas
+
+                                puntaje_total += calcular_puntaje(segundos, puntaje_base) # Calcular el puntaje
+                            tiempo_total += segundos
+
                             #cuando se responde se activa la pausa y se guarda el tiempo de la pausa
                             esperando_respuesta = True 
                             tiempo_pausa = pygame.time.get_ticks()
                             preguntas_respondidas += 1 # Incrementar el contador de preguntas respondidas
+                            segundos = 0 # Reiniciar el contador de segundos
+
 
             elif pantalla_actual == "JUEGO_TERMINADO":
                 volver_rect = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
@@ -150,7 +167,7 @@ while corriendo:  # BUCLE PRINCIPAL
 
     # LÓGICA DEL JUEGO
     if esperando_respuesta:
-        if pygame.time.get_ticks() - tiempo_pausa >= 3000:  # 3000 ms = 3 segundos #tiempo de espera para mostrar la respuesta correcta
+        if pygame.time.get_ticks() - tiempo_pausa >= 2000:  # 2000 ms = 2 segundos #tiempo de espera para mostrar la respuesta correcta
             esperando_respuesta = False 
             if preguntas_respondidas < 10:
                 pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
@@ -194,8 +211,8 @@ while corriendo:  # BUCLE PRINCIPAL
         dibujar_titulo(pantalla, "CONFIGURACIÓN", fuente_titulo, ANCHO_PANTALLA)
         dibujar_botones_menu(pantalla, botones_configuracion, fuente_boton, Y_BOTONES, ANCHO_BOTON, ALTO_BOTON, ESPACIO_ENTRE_BOTONES, ANCHO_PANTALLA)
 
-
     elif pantalla_actual == "EN_JUEGO":
+
         dibujar_timer(pantalla, segundos, fuente_timer)
         dibujar_reset(pantalla, icono_reset)
 
@@ -216,7 +233,7 @@ while corriendo:  # BUCLE PRINCIPAL
 
     elif pantalla_actual == "JUEGO_TERMINADO":
         dibujar_titulo(pantalla, "JUEGO TERMINADO", fuente_titulo, ANCHO_PANTALLA)
-        mensaje = f"Respuestas correctas: {respuestas_correctas} de 10"
+        mensaje = f"Puntaje total: {puntaje_total}, tiempo total: {tiempo_total} segundos, respuestas correctas: {respuestas_correctas}"
         texto = fuente_boton.render(mensaje, True, COLOR_TEXTO)
         pantalla.blit(texto, texto.get_rect(center=(ANCHO_PANTALLA // 2, ALTO_PANTALLA // 2)))
         rect_volver = dibujar_boton_volver(pantalla, fuente_boton)

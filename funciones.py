@@ -91,6 +91,8 @@ def dibujar_fondo_por_pantalla(pantalla: pygame.Surface, pantalla_actual: str):
     """
     if pantalla_actual == "EN_JUEGO":
         ruta = RUTA_IMAGEN_FONDO_JUEGO
+    elif pantalla_actual == "PEDIR_NOMBRE":
+        ruta = RUTA_IMAGEN_FONDO_JUEGO
     elif pantalla_actual == "CONFIGURACIÓN":
         ruta = RUTA_IMAGEN_FONDO_CONFIG
     elif pantalla_actual == "PUNTAJES":
