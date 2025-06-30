@@ -28,7 +28,6 @@ img_comodin_cambiar = pygame.image.load(RUTA_IMAGEN_COMODIN_CAMBIAR)
 img_comodin_5050 = pygame.transform.smoothscale(img_comodin_5050, (100, 140))
 img_comodin_cambiar = pygame.transform.smoothscale(img_comodin_cambiar, (100, 140))
 
-
 # MÚSICA
 pygame.mixer.music.load(RUTA_MUSICA_MENU)
 pygame.mixer.music.play(-1)
@@ -41,8 +40,6 @@ segundos = 0
 pausa = False #bandera para controlar la pausa del juego
 esperando_respuesta = False #
 tiempo_pausa = 0  #acumula en el que se pausa el juego
-
-
 
 pantalla_actual = "MENU"
 musica_activa = True
@@ -71,8 +68,10 @@ puntaje_total = 0
 puntaje_base = 100
 tiempo_total = 0
 
-
-
+# NOMBRE
+nombre_usuario = "" #declaración de variable para el nombre de usuario
+input_activo = False #declaración de variable para controlar si el input está activo
+pantalla_pide_nombre = False #pantalla que pide el nombre de usuario al finalizar el juego
 
 corriendo = True
 
@@ -83,7 +82,7 @@ while corriendo:  # BUCLE PRINCIPAL
             corriendo = False
 
         if evento.type == evento_tick:  # EVENTO PARA EL TIMER
-            if pantalla_actual == "EN_JUEGO" and not esperando_respuesta:#Cambiala condición del timer para que solo sume segundos si no está esperando respuesta:s
+            if pantalla_actual == "EN_JUEGO" and not esperando_respuesta:
                 segundos += 1 
         
         if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:  # CLICK IZQUIERDO
@@ -131,7 +130,6 @@ while corriendo:  # BUCLE PRINCIPAL
                             pantalla_actual = "MENU"
 
             elif pantalla_actual == "EN_JUEGO":
-            #aca abajo esta la condicion que no permite hacer click en las respuestas cuando se esta esperando la respuesta
                 if not esperando_respuesta:
                     volver_rect = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
                     if volver_rect.collidepoint(mouse_pos):
@@ -139,35 +137,39 @@ while corriendo:  # BUCLE PRINCIPAL
                     if pygame.Rect(10, 10, 45, 45).collidepoint(mouse_pos):
                         segundos = 0
                     for i in range(len(botones_respuesta)): # Iterar sobre los botones de respuesta
-                        
                         if botones_respuesta[i].collidepoint(mouse_pos):
                             seleccion = respuestas_actuales[i] # Obtener la respuesta seleccionada
-                            #aca boton de colores cuando es correcto 
                             if seleccion == respuesta_correcta: # Si la respuesta es correcta
-                                
-                                botones_respuesta[i] = dibujar_boton(pantalla, botones_respuesta[i], seleccion, fuente_boton, (0, 255, 0)) # Dibujar el botón de respuesta correcta en verde
-                                
-                                respuestas_correctas += 1 # Incrementar el contador de respuestas correctas
-
-                                puntaje_total += calcular_puntaje(segundos, puntaje_base) # Calcular el puntaje
+                                botones_respuesta[i] = dibujar_boton(pantalla, botones_respuesta[i], seleccion, fuente_boton, (0, 255, 0)) # verde
+                                respuestas_correctas += 1
+                                puntaje_total += calcular_puntaje(segundos, puntaje_base)
                             tiempo_total += segundos
-
-                            #cuando se responde se activa la pausa y se guarda el tiempo de la pausa
                             esperando_respuesta = True 
                             tiempo_pausa = pygame.time.get_ticks()
-                            preguntas_respondidas += 1 # Incrementar el contador de preguntas respondidas
-                            segundos = 0 # Reiniciar el contador de segundos
-
+                            preguntas_respondidas += 1
+                            segundos = 0
 
             elif pantalla_actual == "JUEGO_TERMINADO":
                 volver_rect = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
+                if pantalla_pide_nombre:
+                    input_rect = pygame.Rect((ANCHO_PANTALLA - 300) // 2, 220, 300, 50)
+                    if input_rect.collidepoint(mouse_pos):
+                        input_activo = True
+                    else:
+                        input_activo = False
 
-                if volver_rect.collidepoint(mouse_pos):
-                    pantalla_actual = "MENU"
+        if evento.type == pygame.KEYDOWN and input_activo and pantalla_pide_nombre:
+            if evento.key == pygame.K_BACKSPACE:
+                nombre_usuario = nombre_usuario[:-1]
+            elif evento.key == pygame.K_RETURN:
+                if nombre_usuario.strip() != "":
+                    pantalla_pide_nombre = False
+            elif len(nombre_usuario) < 20 and evento.unicode.isprintable():
+                nombre_usuario += evento.unicode
 
     # LÓGICA DEL JUEGO
     if esperando_respuesta:
-        if pygame.time.get_ticks() - tiempo_pausa >= 2000:  # 2000 ms = 2 segundos #tiempo de espera para mostrar la respuesta correcta
+        if pygame.time.get_ticks() - tiempo_pausa >= 0000:  # 2000 ms = 2 segundos
             esperando_respuesta = False 
             if preguntas_respondidas < 10:
                 pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
@@ -175,20 +177,19 @@ while corriendo:  # BUCLE PRINCIPAL
                 respuesta_correcta = (lambda d, c: d[c])(pregunta_actual, "correcta")
             else:
                 pantalla_actual = "JUEGO_TERMINADO"
+                pantalla_pide_nombre = True  # <-- Activa el input al terminar el juego
         else:
-            # Mostrar mensaje de espera y resaltar respuestas en la misma posición
             dibujar_fondo_por_pantalla(pantalla, pantalla_actual)
             if pregunta_actual:
                 dibujar_pregunta(pantalla, pregunta_actual["pregunta"], fuente_pregunta) 
                 botones_respuesta = []
                 botones_temp = dibujar_respuestas(pantalla, respuestas_actuales, fuente_boton)
-                # Usar la misma lógica de posicionamiento que en dibujar_respuestas y preguntas de if para aca
                 for i in range(len(respuestas_actuales)):
                     respuesta = respuestas_actuales[i]
-                    rect = botones_temp[i]  # Usar el mismo rect que se usó para dibujar la pregunta
-                    if respuesta == respuesta_correcta:#pinta en verde la respuesta correcta
+                    rect = botones_temp[i]
+                    if respuesta == respuesta_correcta:
                         boton = dibujar_boton(pantalla, rect, respuesta, fuente_boton, (0, 255, 0), color_texto=(0,0,0))
-                    else:# pinta en rojo la respuesta incorrecta
+                    else:
                         boton = dibujar_boton(pantalla, rect, respuesta, fuente_boton, (200, 0, 0), color_texto=(255,255,255))
                     botones_respuesta.append(boton)
             dibujar_timer(pantalla, segundos, fuente_timer)
@@ -212,23 +213,17 @@ while corriendo:  # BUCLE PRINCIPAL
         dibujar_botones_menu(pantalla, botones_configuracion, fuente_boton, Y_BOTONES, ANCHO_BOTON, ALTO_BOTON, ESPACIO_ENTRE_BOTONES, ANCHO_PANTALLA)
 
     elif pantalla_actual == "EN_JUEGO":
-
         dibujar_timer(pantalla, segundos, fuente_timer)
         dibujar_reset(pantalla, icono_reset)
-
         if pregunta_actual:
             dibujar_pregunta(pantalla, pregunta_actual["pregunta"], fuente_pregunta)
             botones_respuesta = dibujar_respuestas(pantalla, respuestas_actuales, fuente_boton)
-
-            # DIBUJAR COMODINES COMO IMÁGENES
             espacio = 40
             ancho_total = img_comodin_5050.get_width() + img_comodin_cambiar.get_width() + espacio
             x_inicial = (ANCHO_PANTALLA - ancho_total) // 2
             y_comodin = ALTO_PANTALLA - img_comodin_5050.get_height() - 20
-
             rect_5050 = pantalla.blit(img_comodin_5050, (x_inicial, y_comodin))
             rect_cambiar = pantalla.blit(img_comodin_cambiar, (x_inicial + img_comodin_5050.get_width() + espacio, y_comodin))
-
         dibujar_boton(pantalla, pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40), "VOLVER", fuente_boton)
 
     elif pantalla_actual == "JUEGO_TERMINADO":
@@ -237,13 +232,21 @@ while corriendo:  # BUCLE PRINCIPAL
         texto = fuente_boton.render(mensaje, True, COLOR_TEXTO)
         pantalla.blit(texto, texto.get_rect(center=(ANCHO_PANTALLA // 2, ALTO_PANTALLA // 2)))
         rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
+        if pantalla_pide_nombre:
+            input_rect = pygame.Rect((ANCHO_PANTALLA - 300) // 2, 220, 300, 50)
+            color_input = (255, 255, 255) if input_activo else (200, 200, 200)
+            pygame.draw.rect(pantalla, color_input, input_rect, border_radius=10)
+            pygame.draw.rect(pantalla, (0, 0, 0), input_rect, 2, border_radius=10)
+            texto_input = fuente_boton.render(nombre_usuario, True, (0, 0, 0))
+            pantalla.blit(texto_input, (input_rect.x + 10, input_rect.y + 10))
+            texto_label = fuente_des.render("Ingrese su nombre y presione Enter:", True, (255, 255, 255))
+            pantalla.blit(texto_label, (input_rect.x, input_rect.y - 30))
 
-    if musica_activa == True:
+    if musica_activa:
         pantalla.blit(icono_sonido_on, rect_icono_sonido)
     else:
         pantalla.blit(icono_sonido_off, rect_icono_sonido)
 
     pygame.display.update()
-
 
 pygame.quit()

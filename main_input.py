@@ -1,4 +1,5 @@
 from funciones_respuestas import *
+from main import segundos
 
 ruta = "datos.json"
 ruta_csv = "archivo.csv"
@@ -96,9 +97,9 @@ while True:
 
             else:
                 print("Respuesta incorrecta.")
-        tiempo_respuesta = int(input("Ingrese el tiempo de respuesta: "))
+        #tiempo_respuesta = int(input("Ingrese el tiempo de respuesta: "))
         if correcta == True:
-            acumuludador_puntaje_total += (lambda p,t:p//t)(puntaje_base, tiempo_respuesta)#calcula el puntaje base dividido por el tiempo de respuesta
+            acumuludador_puntaje_total += (lambda p,t:p//t)(puntaje_base, segundos)#calcula el puntaje base dividido por el tiempo de respuesta
         print()
     procentaje_respuestas_correctas = (lambda c,t:c/t*100)(contador_correctas, len(lista_indices_random))#calcula el porcentaje de respuestas correctas
     procentaje_respuestas_correctas = str(procentaje_respuestas_correctas)
