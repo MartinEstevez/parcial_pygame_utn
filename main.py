@@ -13,6 +13,7 @@ pygame.display.set_icon(pygame.image.load(RUTA_FAVICON))
 # FUENTES
 fuente_titulo = pygame.font.SysFont("timesnewroman", TAM_FUENTE_TITULO)
 fuente_boton = pygame.font.SysFont("timesnewroman", TAM_FUENTE_BOTON)
+fuente_marcadores = pygame.font.SysFont('timesnewroman', TAM_FUENTE_MARCADORES)
 fuente_des = pygame.font.SysFont("timesnewroman", TAM_FUENTE_DES)
 fuente_timer = pygame.font.SysFont("timesnewroman", TAM_FUENTE_TIMER)
 fuente_pregunta = pygame.font.SysFont("timesnewroman", TAM_FUENTE_PREGUNTA)
@@ -45,7 +46,7 @@ pantalla_actual = "MENU"
 musica_activa = True
 
 botones_menu = ["JUGAR", "PUNTAJES", "CONFIGURACIÓN", "SALIR"]
-botones_configuracion = ["DIMENSIONES", "SONIDO", "VOLVER"]
+botones_configuracion = ["DIMENSIONES", "SONIDO"]
 desarrolladores = ["Martín Estevez", "Nicolas Rial Dell Anna", "Tomas Gil"]
 
 # Juego
@@ -111,14 +112,29 @@ while corriendo:  # BUCLE PRINCIPAL
                             segundos = 0
                             respuestas_correctas = 0
                             preguntas_respondidas = 0
+                            puntaje_total = 0           # <-- Reinicia el puntaje acumulado
+                            tiempo_total = 0            # <-- Reinicia el tiempo total
+                            nombre_usuario = ""         # <-- Reinicia el nombre de usuario si querés
+                            pantalla_pide_nombre = False
+                            input_activo = False
                             lista_preguntas = leer_archivo_json("datos.json")
                             indices_preguntas = crear_lista_indices_random(10, 0, len(lista_preguntas) - 1)
                             pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
                             respuestas_actuales = obtener_respuestas(pregunta_actual)
                             respuesta_correcta = (lambda d, c: d[c])(pregunta_actual, "correcta")
 
+                        elif botones_menu[i] == "PUNTAJES":
+                            pantalla_actual = "PUNTAJES"
+                            lista_puntajes = leer_puntajes_csv("puntajes.csv")
+
+
                         elif botones_menu[i] == "CONFIGURACIÓN":
                             pantalla_actual = "CONFIGURACIÓN"
+
+            elif pantalla_actual == "PUNTAJES":
+                volver_rect = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
+                if volver_rect.collidepoint(mouse_pos):
+                    pantalla_actual = "MENU"
 
             elif pantalla_actual == "CONFIGURACIÓN":
                 x = (ANCHO_PANTALLA - ANCHO_BOTON) / 2
@@ -150,13 +166,20 @@ while corriendo:  # BUCLE PRINCIPAL
                             segundos = 0
 
             elif pantalla_actual == "JUEGO_TERMINADO":
-                volver_rect = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
-                if pantalla_pide_nombre:
-                    input_rect = pygame.Rect((ANCHO_PANTALLA - 300) // 2, 220, 300, 50)
-                    if input_rect.collidepoint(mouse_pos):
-                        input_activo = True
-                    else:
-                        input_activo = False
+                rect_volver = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
+                if rect_volver.collidepoint(mouse_pos):
+                    pantalla_actual = "MENU"
+                # Calcula igual que en el render
+                y_inicio = 200
+                marcador_1 = fuente_boton.render(f"Puntaje total: {puntaje_total}", True, COLOR_TEXTO)
+                marcador_2 = fuente_boton.render(f"Tiempo: {tiempo_total} segundos", True, COLOR_TEXTO)
+                marcador_3 = fuente_boton.render(f"Respuestas correctas: {respuestas_correctas}", True, COLOR_TEXTO)
+                y_input = y_inicio + marcador_1.get_height() + marcador_2.get_height() + marcador_3.get_height() + 50
+                input_rect = pygame.Rect((ANCHO_PANTALLA - 300) // 2, y_input, 300, 50)
+                if input_rect.collidepoint(mouse_pos):
+                    input_activo = True
+                else:
+                    input_activo = False
 
         if evento.type == pygame.KEYDOWN and input_activo and pantalla_pide_nombre:
             if evento.key == pygame.K_BACKSPACE:
@@ -164,12 +187,13 @@ while corriendo:  # BUCLE PRINCIPAL
             elif evento.key == pygame.K_RETURN:
                 if nombre_usuario.strip() != "":
                     pantalla_pide_nombre = False
+                    input_activo = False
             elif len(nombre_usuario) < 20 and evento.unicode.isprintable():
                 nombre_usuario += evento.unicode
 
     # LÓGICA DEL JUEGO
     if esperando_respuesta:
-        if pygame.time.get_ticks() - tiempo_pausa >= 0000:  # 2000 ms = 2 segundos
+        if pygame.time.get_ticks() - tiempo_pausa >= 1000:  # 2000 ms = 2 segundos
             esperando_respuesta = False 
             if preguntas_respondidas < 10:
                 pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
@@ -178,6 +202,7 @@ while corriendo:  # BUCLE PRINCIPAL
             else:
                 pantalla_actual = "JUEGO_TERMINADO"
                 pantalla_pide_nombre = True  # <-- Activa el input al terminar el juego
+                input_activo = True
         else:
             dibujar_fondo_por_pantalla(pantalla, pantalla_actual)
             if pregunta_actual:
@@ -192,6 +217,7 @@ while corriendo:  # BUCLE PRINCIPAL
                     else:
                         boton = dibujar_boton(pantalla, rect, respuesta, fuente_boton, (200, 0, 0), color_texto=(255,255,255))
                     botones_respuesta.append(boton)
+
             dibujar_timer(pantalla, segundos, fuente_timer)
             dibujar_reset(pantalla, icono_reset)
             dibujar_boton(pantalla, pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40), "VOLVER", fuente_boton)
@@ -215,6 +241,28 @@ while corriendo:  # BUCLE PRINCIPAL
     elif pantalla_actual == "EN_JUEGO":
         dibujar_timer(pantalla, segundos, fuente_timer)
         dibujar_reset(pantalla, icono_reset)
+        # Marcadores compactos en la esquina inferior izquierda
+        marcador_puntaje = fuente_marcadores.render(f"PUNTAJE = {puntaje_total}", True, COLOR_TEXTO)
+        if preguntas_respondidas > 0:
+            porcentaje = int((respuestas_correctas / preguntas_respondidas) * 100)
+        else:
+            porcentaje = 0
+        marcador_porcentaje = fuente_marcadores.render(f"% CORRECTAS = {porcentaje} %", True, COLOR_TEXTO)
+
+        # Posiciones y tamaño compacto
+        margen_x = 15
+        margen_y = 15
+        padding = 10
+        espacio_textos = 5
+        rect_ancho = max(marcador_puntaje.get_width(), marcador_porcentaje.get_width()) + 2 * padding
+        rect_alto = marcador_puntaje.get_height() + marcador_porcentaje.get_height() + espacio_textos + 2 * padding
+
+        rect = pygame.Rect(margen_x, ALTO_PANTALLA - rect_alto - margen_y, rect_ancho, rect_alto)
+        pygame.draw.rect(pantalla, COLOR_FONDO_BOTON, rect)
+        pygame.draw.rect(pantalla, (180, 180, 180), rect, 2)
+
+        pantalla.blit(marcador_puntaje, (rect.x + padding, rect.y + padding))
+        pantalla.blit(marcador_porcentaje, (rect.x + padding, rect.y + padding + marcador_puntaje.get_height() + espacio_textos))
         if pregunta_actual:
             dibujar_pregunta(pantalla, pregunta_actual["pregunta"], fuente_pregunta)
             botones_respuesta = dibujar_respuestas(pantalla, respuestas_actuales, fuente_boton)
@@ -228,19 +276,35 @@ while corriendo:  # BUCLE PRINCIPAL
 
     elif pantalla_actual == "JUEGO_TERMINADO":
         dibujar_titulo(pantalla, "JUEGO TERMINADO", fuente_titulo, ANCHO_PANTALLA)
-        mensaje = f"Puntaje total: {puntaje_total}, tiempo total: {tiempo_total} segundos, respuestas correctas: {respuestas_correctas}"
-        texto = fuente_boton.render(mensaje, True, COLOR_TEXTO)
-        pantalla.blit(texto, texto.get_rect(center=(ANCHO_PANTALLA // 2, ALTO_PANTALLA // 2)))
+        marcador_1 = fuente_boton.render(f"Puntaje total: {puntaje_total}", True, COLOR_TEXTO)
+        marcador_2 = fuente_boton.render(f"Tiempo: {tiempo_total} segundos", True, COLOR_TEXTO)
+        marcador_3 = fuente_boton.render(f"Respuestas correctas: {respuestas_correctas}", True, COLOR_TEXTO)
+
+        # Ajusta este valor para dejar espacio debajo del título
+        y_inicio = 200  # Por ejemplo, 120 píxeles desde arriba
+
+        pantalla.blit(marcador_1, ((ANCHO_PANTALLA - marcador_1.get_width()) // 2, y_inicio))
+        pantalla.blit(marcador_2, ((ANCHO_PANTALLA - marcador_2.get_width()) // 2, y_inicio + marcador_1.get_height() + 10))
+        pantalla.blit(marcador_3, ((ANCHO_PANTALLA - marcador_3.get_width()) // 2, y_inicio + marcador_1.get_height() + marcador_2.get_height() + 20))
         rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
+
         if pantalla_pide_nombre:
-            input_rect = pygame.Rect((ANCHO_PANTALLA - 300) // 2, 220, 300, 50)
+            y_input = y_inicio + marcador_1.get_height() + marcador_2.get_height() + marcador_3.get_height() + 50
+            input_rect = pygame.Rect((ANCHO_PANTALLA - 300) // 2, y_input, 300, 50)
             color_input = (255, 255, 255) if input_activo else (200, 200, 200)
             pygame.draw.rect(pantalla, color_input, input_rect, border_radius=10)
             pygame.draw.rect(pantalla, (0, 0, 0), input_rect, 2, border_radius=10)
             texto_input = fuente_boton.render(nombre_usuario, True, (0, 0, 0))
             pantalla.blit(texto_input, (input_rect.x + 10, input_rect.y + 10))
             texto_label = fuente_des.render("Ingrese su nombre y presione Enter:", True, (255, 255, 255))
-            pantalla.blit(texto_label, (input_rect.x, input_rect.y - 30))
+            label_rect = texto_label.get_rect(center=(input_rect.centerx, input_rect.y - 15))
+            pantalla.blit(texto_label, label_rect)
+
+
+    elif pantalla_actual == "PUNTAJES":
+        dibujar_titulo(pantalla, "PUNTAJES", fuente_titulo, ANCHO_PANTALLA)
+        dibujar_tabla_puntajes(pantalla, lista_puntajes, fuente_boton)
+        dibujar_boton_volver(pantalla, fuente_boton)
 
     if musica_activa:
         pantalla.blit(icono_sonido_on, rect_icono_sonido)

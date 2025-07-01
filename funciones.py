@@ -1,8 +1,11 @@
 import pygame
 from configuraciones import *
+import csv
+
+ruta_csv = "puntajes.csv"
 
 def dibujar_boton(pantalla: pygame.Surface, rect_boton: pygame.Rect, texto: str, fuente: pygame.font.Font, color_fondo=COLOR_FONDO_BOTON, color_texto=COLOR_TEXTO):
-    pygame.draw.rect(pantalla, color_fondo, rect_boton, border_radius=10)
+    pygame.draw.rect(pantalla, color_fondo, rect_boton)
     texto_render = fuente.render(texto, True, color_texto)
     rect_texto = texto_render.get_rect(center=rect_boton.center)
     pantalla.blit(texto_render, rect_texto)
@@ -120,7 +123,53 @@ def dibujar_comodines(pantalla: pygame.Surface, nombres: list, fuente: pygame.fo
 
     return botones
 
+def leer_puntajes_csv(ruta_csv: str) -> list[dict]:
+    """
+    Lee un archivo CSV de puntajes y devuelve una lista de diccionarios.
+    """
+    with open(ruta_csv, newline='', encoding='utf-8') as archivo:
+        lector = csv.DictReader(archivo)
+        return list(lector)
 
+def dibujar_tabla_puntajes(pantalla: pygame.Surface, puntajes: list[dict], fuente: pygame.font.Font):
+    encabezados = ["Nombre", "Puntaje"]
+    x_inicial = ANCHO_PANTALLA * 0.2
+    y_inicial = ALTO_PANTALLA * 0.50
+    ancho_columna = ANCHO_PANTALLA * 0.3
+    alto_fila = ALTO_PANTALLA * 0.06
+    espacio = ALTO_PANTALLA * 0.01
+    color_fondo = (0, 0, 0)
+    color_linea = (255, 255, 255)
+    color_texto_puntaje = (0, 0, 0)
+
+    filas = len(puntajes) + 1  # +1 por encabezado
+
+    # Fondo de la tabla
+    ancho_tabla = 2 * ancho_columna + espacio
+    alto_tabla = filas * (alto_fila + espacio)
+    pygame.draw.rect(pantalla, color_fondo, (x_inicial - 2, y_inicial - 2, ancho_tabla + 4, alto_tabla + 2))
+
+    # Encabezados
+    for i in range(len(encabezados)):
+        rect = pygame.Rect(x_inicial + i * (ancho_columna + espacio), y_inicial, ancho_columna, alto_fila)
+        pygame.draw.rect(pantalla, color_linea, rect)
+        texto = fuente.render(encabezados[i], True, color_texto_puntaje)
+        pantalla.blit(texto, texto.get_rect(center=rect.center))
+
+    # Filas de puntajes
+    for fila in range(len(puntajes)):
+        y = y_inicial + (fila + 1) * (alto_fila + espacio)
+        jugador = puntajes[fila]
+        # Nombre
+        rect_nombre = pygame.Rect(x_inicial, y, ancho_columna, alto_fila)
+        pygame.draw.rect(pantalla, color_linea, rect_nombre)
+        texto_nombre = fuente.render(jugador["nombre"], True, color_texto_puntaje)
+        pantalla.blit(texto_nombre, texto_nombre.get_rect(center=rect_nombre.center))
+        # Puntaje
+        rect_puntaje = pygame.Rect(x_inicial + ancho_columna + espacio, y, ancho_columna, alto_fila)
+        pygame.draw.rect(pantalla, color_linea, rect_puntaje)
+        texto_puntaje = fuente.render(jugador["puntaje"], True, color_texto_puntaje)
+        pantalla.blit(texto_puntaje, texto_puntaje.get_rect(center=rect_puntaje.center))
 
 
 
