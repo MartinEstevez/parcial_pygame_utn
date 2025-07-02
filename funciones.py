@@ -12,8 +12,8 @@ def dibujar_boton(pantalla: pygame.Surface, rect_boton: pygame.Rect, texto: str,
         rect_boton (pygame.Rect): El rectángulo que define la posición y tamaño del botón.
         texto (str): El texto a mostrar en el botón.
         fuente (pygame.font.Font): La fuente a utilizar para el texto.
-        color_fondo (tuple, optional): El color de fondo del botón. Defaults to COLOR_FONDO_BOTON.
-        color_texto (tuple, optional): El color del texto. Defaults to COLOR_TEXTO.
+        color_fondo (tuple, optional): El color de fondo del botón. 
+        color_texto (tuple, optional): El color del texto.
     """
     pygame.draw.rect(pantalla, color_fondo, rect_boton)
     texto_render = fuente.render(texto, True, color_texto)
