@@ -126,6 +126,7 @@ while corriendo:  # BUCLE PRINCIPAL
                             corriendo = False
 
                         elif botones_menu[i] == "JUGAR":
+                            usar_comodin = True
                             pantalla_actual = "EN_JUEGO"
                             segundos = 0
                             respuestas_correctas = 0
@@ -340,7 +341,8 @@ while corriendo:  # BUCLE PRINCIPAL
             dibujar_pregunta(pantalla, pregunta_actual["pregunta"], fuente_pregunta)
             botones_respuesta = dibujar_respuestas(pantalla, respuestas_actuales, fuente_boton)
             imagenes_comodines = [img_comodin_5050, img_comodin_cambiar, img_comodin_pausar_el_tiempo]
-            botones_comodines = dibujar_comodines(pantalla, imagenes_comodines)
+            if comodin_usado == False:
+                botones_comodines = dibujar_comodines(pantalla, imagenes_comodines)            
             
         rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
 
