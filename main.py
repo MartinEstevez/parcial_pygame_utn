@@ -42,9 +42,12 @@ pygame.mixer.music.set_volume(0.5)
 evento_tick = pygame.USEREVENT + 3
 pygame.time.set_timer(evento_tick, 1000)
 segundos = 0
-pausa = False #bandera para controlar la pausa del juego
-esperando_respuesta = False #
-tiempo_pausa = 0  #acumula en el que se pausa el juego
+pausa = False # BANDERA PARA CONTROLAR LA PAUSA DEL JUEGO
+esperando_respuesta = False
+tiempo_pausa = 0
+
+#RESET
+rect_reset = None
 
 pantalla_actual = "MENU"
 musica_activa = True
@@ -66,7 +69,8 @@ respuestas_correctas = 0
 ## Comodines
 nombres_comodines = ["50/50", "CAMBIAR"]
 botones_comodines = []
-#bandera para activar los comodines
+
+# BANDERA PARA COMODINES
 comodin_oculto = False
 comodin_5050_usado = False
 comodin_cambiar_usado = False
@@ -77,16 +81,16 @@ comodin_usado = False
 puntaje_total = 0
 puntaje_base = 100
 tiempo_total = 0
-datos_csv = leer_archivo("puntajes.csv")#cargar datos del archivo CSV
-if datos_csv == None:#si no hay datos, inicializar lista vacía
+datos_csv = leer_archivo("puntajes.csv") #CARGAR DATOS DEL ARCHIVO CSV
+if datos_csv == None: # SI NO HAY DATOS, LA INICIALIZA VACIA
     lista_jugadores  = []
 else:
-    lista_jugadores = cargar_datos(datos_csv)#cargar datos del archivo CSV
+    lista_jugadores = cargar_datos(datos_csv) # CARGAR DATOS DEL ARCHIVO CSV
 
 # NOMBRE
-nombre_usuario = "" #declaración de variable para el nombre de usuario
-input_activo = False #declaración de variable para controlar si el input está activo
-pantalla_pide_nombre = False #pantalla que pide el nombre de usuario al finalizar el juego
+nombre_usuario = "" #VARIABLE PARA EL NOMBRE DE USUARIO
+input_activo = False # PARA CONTROLAR SI EL INPUT ESTA ACTIVO
+pantalla_pide_nombre = False # PANTALLA QUE PIDE EL NOMBRE DEL USUARIO AL FINALIZAR
 
 corriendo = True
 
@@ -97,10 +101,10 @@ while corriendo:  # BUCLE PRINCIPAL
             corriendo = False
 
         if evento.type == evento_tick:  # EVENTO PARA EL TIMER
-            if pantalla_actual == "EN_JUEGO" and not esperando_respuesta and not pausa:#se le agrego la condición de pausa
+            if pantalla_actual == "EN_JUEGO" and not esperando_respuesta and not pausa:
                 segundos += 1 
         
-        if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:  # CLICK IZQUIERDO
+        if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
             mouse_pos = pygame.mouse.get_pos()
 
             if rect_icono_sonido.collidepoint(mouse_pos):
@@ -128,7 +132,7 @@ while corriendo:  # BUCLE PRINCIPAL
                             preguntas_respondidas = 0
                             puntaje_total = 0           # <-- Reinicia el puntaje acumulado
                             tiempo_total = 0            # <-- Reinicia el tiempo total
-                            nombre_usuario = ""         # <-- Reinicia el nombre de usuario si querés
+                            nombre_usuario = ""
                             pantalla_pide_nombre = False
                             input_activo = False
                             lista_preguntas = leer_archivo_json("datos.json")
@@ -156,10 +160,9 @@ while corriendo:  # BUCLE PRINCIPAL
                 for i in range(len(botones_configuracion)):
                     y = Y_BOTONES + i * (ALTO_BOTON + ESPACIO_ENTRE_BOTONES)
                     if pygame.Rect(x, y, ANCHO_BOTON, ALTO_BOTON).collidepoint(mouse_pos):
-                        # Aquí podrías agregar lógica para otros botones de configuración si los agregas
-                        pass
+                        print (f"Falta programar los botones de configuración!")
 
-                # Detectar clic en el botón VOLVER (esquina inferior derecha)
+                # Detectar clic en el botón VOLVER
                 rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
                 if rect_volver.collidepoint(mouse_pos):
                     pantalla_actual = "MENU"
@@ -167,10 +170,32 @@ while corriendo:  # BUCLE PRINCIPAL
             elif pantalla_actual == "EN_JUEGO":
                 if not esperando_respuesta:
                     rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
+                    if rect_reset.collidepoint(mouse_pos):
+                        # Reiniciar variables de la partida
+                        segundos = 0
+                        respuestas_correctas = 0
+                        preguntas_respondidas = 0
+                        puntaje_total = 0
+                        tiempo_total = 0
+                        nombre_usuario = ""
+                        pantalla_pide_nombre = False
+                        input_activo = False
+                        lista_preguntas = leer_archivo_json("datos.json")
+                        indices_preguntas = crear_lista_indices_random(10, 0, len(lista_preguntas) - 1)
+                        pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
+                        respuestas_actuales = obtener_respuestas(pregunta_actual)
+                        respuesta_correcta = (lambda d, c: d[c])(pregunta_actual, "correcta")
+                        comodin_5050_usado = False
+                        comodin_cambiar_usado = False
+                        comodin_pausar_usado = False
+                        comodin_usado = False
+
                     if rect_volver.collidepoint(mouse_pos):
                         pantalla_actual = "MENU"
+
                     if pygame.Rect(10, 10, 45, 45).collidepoint(mouse_pos):
                         segundos = 0
+
                     # --- Comodines ---
                     for i in range(len(botones_comodines)):
                         if botones_comodines[i].collidepoint(mouse_pos):
@@ -214,10 +239,10 @@ while corriendo:  # BUCLE PRINCIPAL
                             segundos = 0
 
             elif pantalla_actual == "JUEGO_TERMINADO":
-                rect_volver = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
+                rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
                 if rect_volver.collidepoint(mouse_pos):
                     pantalla_actual = "MENU"
-                # Calcula igual que en el render
+
                 y_inicio = 200
                 marcador_1 = fuente_boton.render(f"Puntaje total: {puntaje_total}", True, COLOR_TEXTO)
                 marcador_2 = fuente_boton.render(f"Tiempo: {tiempo_total} segundos", True, COLOR_TEXTO)
@@ -239,16 +264,16 @@ while corriendo:  # BUCLE PRINCIPAL
                     # Guardar puntaje, tiempo y nombre al presionar Enter
                     actualizar_ranking(nombre_usuario, puntaje_total, tiempo_total, "puntajes.csv")
                     # REACTIVAR comodines al finalizar partida y guardar nombre
-                    comodin_5050_usado = False#activa el comodín 50/50
-                    comodin_cambiar_usado = False#activa el comodín de cambiar la pregunta
-                    comodin_pausar_usado = False#activa el comodín de pausar el tiempo
-                    comodin_usado = False#bandera para controlar si se usó un comodín
+                    comodin_5050_usado = False #activa el comodín 50/50
+                    comodin_cambiar_usado = False #activa el comodín de cambiar la pregunta
+                    comodin_pausar_usado = False #activa el comodín de pausar el tiempo
+                    comodin_usado = False # bandera para controlar si se usó un comodín
             elif len(nombre_usuario) < 20 and evento.unicode.isprintable():
                 nombre_usuario += evento.unicode
 
     # LÓGICA DEL JUEGO
     if esperando_respuesta:
-        if pygame.time.get_ticks() - tiempo_pausa >= 0000:  # 5000 ms = 5 segundos
+        if pygame.time.get_ticks() - tiempo_pausa >= 1000:  # 2000 ms = 2 segundos
             esperando_respuesta = False
             pausa = False  # <-- REANUDA el timer después de responder, incluso si venía de comodín
             pygame.mixer.music.unpause()  # <-- Reanuda la música principal
@@ -280,7 +305,7 @@ while corriendo:  # BUCLE PRINCIPAL
                     botones_respuesta.append(boton)
 
             dibujar_timer(pantalla, segundos, fuente_timer)
-            dibujar_reset(pantalla, icono_reset)
+            rect_reset = dibujar_reset(pantalla, icono_reset)
             rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
             pantalla.blit(icono_sonido_on if musica_activa else icono_sonido_off, rect_icono_sonido)
             pygame.display.update()
@@ -309,7 +334,7 @@ while corriendo:  # BUCLE PRINCIPAL
     
     elif pantalla_actual == "EN_JUEGO":
         dibujar_timer(pantalla, segundos, fuente_timer)
-        dibujar_reset(pantalla, icono_reset)
+        rect_reset = dibujar_reset(pantalla, icono_reset)
         dibujar_marcadores(pantalla, puntaje_total, respuestas_correctas, preguntas_respondidas, fuente_marcadores, COLOR_FONDO_BOTON, COLOR_TEXTO)        
         if pregunta_actual:
             dibujar_pregunta(pantalla, pregunta_actual["pregunta"], fuente_pregunta)
