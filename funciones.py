@@ -73,8 +73,8 @@ def dibujar_reset(pantalla: pygame.Surface, icono_reset: pygame.Surface):
     y = ALTO_PANTALLA * 0.015
 
     rect_reset = pygame.Rect(x, y, ancho, alto)
-    pygame.draw.rect(pantalla, COLOR_FONDO_BOTON, rect_reset, border_radius=10)
-    pygame.draw.rect(pantalla, COLOR_BORDE_TIMER, rect_reset, 2, border_radius=10)
+    pygame.draw.rect(pantalla, COLOR_FONDO_BOTON, rect_reset)
+    pygame.draw.rect(pantalla, COLOR_BORDE_TIMER, rect_reset, 2)
 
     ancho_img = ANCHO_PANTALLA * 0.0375
     alto_img = ALTO_PANTALLA * 0.05
@@ -82,6 +82,7 @@ def dibujar_reset(pantalla: pygame.Surface, icono_reset: pygame.Surface):
     y_img = y + (alto - alto_img) / 2
 
     pantalla.blit(icono_reset, pygame.Rect(x_img, y_img, ancho_img, alto_img))
+    return rect_reset
 
 def dibujar_boton_volver(pantalla: pygame.Surface, fuente: pygame.font.Font):
     ancho_boton = int(ANCHO_PANTALLA * 0.18)
@@ -180,7 +181,7 @@ def dibujar_tabla_puntajes(pantalla: pygame.Surface, puntajes: list[dict], fuent
         texto_puntaje = fuente.render(jugador["puntaje"], True, color_texto_puntaje)
         pantalla.blit(texto_puntaje, texto_puntaje.get_rect(center=rect_puntaje.center))
 
-def dibujar_marcadores(pantalla, puntaje_total, respuestas_correctas, preguntas_respondidas, fuente, color_fondo, color_texto):
+def dibujar_marcadores(pantalla: pygame.Surface, puntaje_total: int, respuestas_correctas: int, preguntas_respondidas: int, fuente: pygame.font.Font, color_fondo: tuple, color_texto: tuple):
     """
     Dibuja los marcadores de puntaje y porcentaje en la esquina inferior izquierda,
     con un rectángulo de fondo sencillo.
