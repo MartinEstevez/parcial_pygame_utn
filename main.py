@@ -25,9 +25,11 @@ icono_reset = pygame.transform.scale(pygame.image.load(RUTA_ICONO_RESET), (30, 3
 rect_icono_sonido = icono_sonido_on.get_rect(topright=(ANCHO_PANTALLA, 10))
 img_comodin_5050 = pygame.image.load(RUTA_IMAGEN_COMODIN_50_50)
 img_comodin_cambiar = pygame.image.load(RUTA_IMAGEN_COMODIN_CAMBIAR)
+img_comodin_pausar_el_tiempo = pygame.image.load(RUTA_IMAGEN_COMODIN_PAUSAR_EL_TIEMPO)
 
 img_comodin_5050 = pygame.transform.smoothscale(img_comodin_5050, (100, 140))
 img_comodin_cambiar = pygame.transform.smoothscale(img_comodin_cambiar, (100, 140))
+img_comodin_pausar_el_tiempo = pygame.transform.smoothscale(img_comodin_pausar_el_tiempo, (100, 140))
 
 # MÚSICA
 pygame.mixer.music.load(RUTA_MUSICA_MENU)
@@ -59,15 +61,25 @@ respuesta_correcta = ""
 botones_respuesta = []
 respuestas_correctas = 0
 
-# Comodines
+## Comodines
 nombres_comodines = ["50/50", "CAMBIAR"]
 botones_comodines = []
+#bandera para activar los comodines
 comodin_oculto = False
+comodin_5050_usado = False
+comodin_cambiar_usado = False
+comodin_pausar_usado = False
+comodin_usado = False
 
 # Puntajes
 puntaje_total = 0
 puntaje_base = 100
 tiempo_total = 0
+datos_csv = leer_archivo("puntajes.csv")#cargar datos del archivo CSV
+if datos_csv == None:#si no hay datos, inicializar lista vacía
+    lista_jugadores  = []
+else:
+    lista_jugadores = cargar_datos(datos_csv)#cargar datos del archivo CSV
 
 # NOMBRE
 nombre_usuario = "" #declaración de variable para el nombre de usuario
@@ -83,7 +95,7 @@ while corriendo:  # BUCLE PRINCIPAL
             corriendo = False
 
         if evento.type == evento_tick:  # EVENTO PARA EL TIMER
-            if pantalla_actual == "EN_JUEGO" and not esperando_respuesta:
+            if pantalla_actual == "EN_JUEGO" and not esperando_respuesta and not pausa:#se le agrego la condición de pausa
                 segundos += 1 
         
         if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:  # CLICK IZQUIERDO
@@ -142,8 +154,13 @@ while corriendo:  # BUCLE PRINCIPAL
                 for i in range(len(botones_configuracion)):
                     y = Y_BOTONES + i * (ALTO_BOTON + ESPACIO_ENTRE_BOTONES)
                     if pygame.Rect(x, y, ANCHO_BOTON, ALTO_BOTON).collidepoint(mouse_pos):
-                        if botones_configuracion[i] == "VOLVER":
-                            pantalla_actual = "MENU"
+                        # Aquí podrías agregar lógica para otros botones de configuración si los agregas
+                        pass
+
+                # Detectar clic en el botón VOLVER (esquina inferior derecha)
+                volver_rect = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
+                if volver_rect.collidepoint(mouse_pos):
+                    pantalla_actual = "MENU"
 
             elif pantalla_actual == "EN_JUEGO":
                 if not esperando_respuesta:
@@ -152,7 +169,59 @@ while corriendo:  # BUCLE PRINCIPAL
                         pantalla_actual = "MENU"
                     if pygame.Rect(10, 10, 45, 45).collidepoint(mouse_pos):
                         segundos = 0
-                    for i in range(len(botones_respuesta)): # Iterar sobre los botones de respuesta
+                    # --- Comodines ---
+                    espacio = 40
+                    ancho_comodin = img_comodin_5050.get_width()
+                    alto_comodin = img_comodin_5050.get_height()
+                    ancho_total = ancho_comodin * 3 + espacio * 2
+                    x_inicial = (ANCHO_PANTALLA - ancho_total) // 2
+                    y_comodin = ALTO_PANTALLA - alto_comodin - 20
+
+
+                    # 50/50
+                    x_5050 = x_inicial
+                    rect_5050 = pygame.Rect(x_5050, y_comodin, ancho_comodin, alto_comodin)
+                    if rect_5050 and rect_5050.collidepoint(mouse_pos) and not comodin_5050_usado and not comodin_usado:
+                        # Lógica del comodín 50/50
+                        respuestas_a_mostrar = [respuesta_correcta]
+                        # Agrega una incorrecta aleatoria
+                        incorrectas = [r for r in respuestas_actuales if r != respuesta_correcta]
+                        if incorrectas:
+                            import random
+                            respuestas_a_mostrar.append(random.choice(incorrectas))
+                        # Mezcla las dos respuestas a mostrar
+                        random.shuffle(respuestas_a_mostrar)
+                        respuestas_actuales = respuestas_a_mostrar
+                        comodin_5050_usado = True
+                        comodin_usado = True
+
+                    # CAMBIAR
+                    x_cambiar = x_inicial + ancho_comodin + espacio
+                    rect_cambiar = pygame.Rect(x_cambiar, y_comodin, ancho_comodin, alto_comodin)
+                    if rect_cambiar and rect_cambiar.collidepoint(mouse_pos) and not comodin_cambiar_usado and not comodin_usado:
+                        # Cambiar la pregunta actual
+                        preguntas_respondidas += 1
+                        if preguntas_respondidas < 10:
+                            pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
+                            respuestas_actuales = obtener_respuestas(pregunta_actual)
+                            respuesta_correcta = (lambda d, c: d[c])(pregunta_actual, "correcta")
+                            segundos = 0
+                            comodin_cambiar_usado = True
+                            comodin_usado = True
+                        else:
+                            pantalla_actual = "JUEGO_TERMINADO"
+                            pantalla_pide_nombre = True
+
+                    # PAUSAR TIEMPO
+                    x_pausa = x_inicial + (ancho_comodin + espacio) * 2 
+                    rect_pausa = pygame.Rect(x_pausa, y_comodin, ancho_comodin, alto_comodin)
+                    if rect_pausa and rect_pausa.collidepoint(mouse_pos) and not comodin_pausar_usado and not comodin_usado:# se usa el comodín de pausar
+                        # Pausar el tiempo
+                        comodin_pausar_usado = True #activa el comodín de pausar el tiempo
+                        comodin_usado = True #  bandera para controlar si se usó un comodín
+                        pausa = True  # Pausa el timer
+
+                    for i in range(len(botones_respuesta)):
                         if botones_respuesta[i].collidepoint(mouse_pos):
                             seleccion = respuestas_actuales[i] # Obtener la respuesta seleccionada
                             if seleccion == respuesta_correcta: # Si la respuesta es correcta
@@ -188,13 +257,21 @@ while corriendo:  # BUCLE PRINCIPAL
                 if nombre_usuario.strip() != "":
                     pantalla_pide_nombre = False
                     input_activo = False
+                    # Guardar puntaje, tiempo y nombre al presionar Enter
+                    actualizar_ranking(nombre_usuario, puntaje_total, tiempo_total, "puntajes.csv")
+                    # REACTIVAR comodines al finalizar partida y guardar nombre
+                    comodin_5050_usado = False#activa el comodín 50/50
+                    comodin_cambiar_usado = False#activa el comodín de cambiar la pregunta
+                    comodin_pausar_usado = False#activa el comodín de pausar el tiempo
+                    comodin_usado = False#bandera para controlar si se usó un comodín
             elif len(nombre_usuario) < 20 and evento.unicode.isprintable():
                 nombre_usuario += evento.unicode
 
     # LÓGICA DEL JUEGO
     if esperando_respuesta:
-        if pygame.time.get_ticks() - tiempo_pausa >= 1000:  # 2000 ms = 2 segundos
-            esperando_respuesta = False 
+        if pygame.time.get_ticks() - tiempo_pausa >= 0000:  # 2000 ms = 2 segundos
+            esperando_respuesta = False
+            pausa = False  # <-- REANUDA el timer después de responder, incluso si venía de comodín
             if preguntas_respondidas < 10:
                 pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
                 respuestas_actuales = obtener_respuestas(pregunta_actual)
@@ -203,10 +280,14 @@ while corriendo:  # BUCLE PRINCIPAL
                 pantalla_actual = "JUEGO_TERMINADO"
                 pantalla_pide_nombre = True  # <-- Activa el input al terminar el juego
                 input_activo = True
+                #Guardar puntaje, tiempo y nombre si ya hay nombre
+                if nombre_usuario.strip() != "":
+                    actualizar_ranking(nombre_usuario, puntaje_total, tiempo_total, "puntajes.csv")
+
         else:
             dibujar_fondo_por_pantalla(pantalla, pantalla_actual)
             if pregunta_actual:
-                dibujar_pregunta(pantalla, pregunta_actual["pregunta"], fuente_pregunta) 
+                dibujar_pregunta(pantalla, pregunta_actual["pregunta"], fuente_pregunta)
                 botones_respuesta = []
                 botones_temp = dibujar_respuestas(pantalla, respuestas_actuales, fuente_boton)
                 for i in range(len(respuestas_actuales)):
@@ -223,7 +304,7 @@ while corriendo:  # BUCLE PRINCIPAL
             dibujar_boton(pantalla, pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40), "VOLVER", fuente_boton)
             pantalla.blit(icono_sonido_on if musica_activa else icono_sonido_off, rect_icono_sonido)
             pygame.display.update()
-            continue  # Saltar el resto del bucle para evitar interacción 
+            continue  # Saltar el resto del bucle para evitar interacción
 
     dibujar_fondo_por_pantalla(pantalla, pantalla_actual)
 
@@ -237,7 +318,9 @@ while corriendo:  # BUCLE PRINCIPAL
     elif pantalla_actual == "CONFIGURACIÓN":
         dibujar_titulo(pantalla, "CONFIGURACIÓN", fuente_titulo, ANCHO_PANTALLA)
         dibujar_botones_menu(pantalla, botones_configuracion, fuente_boton, Y_BOTONES, ANCHO_BOTON, ALTO_BOTON, ESPACIO_ENTRE_BOTONES, ANCHO_PANTALLA)
-
+        # Botón VOLVER en la pantalla de configuración
+        dibujar_boton(pantalla, pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40), "VOLVER", fuente_boton)
+    
     elif pantalla_actual == "EN_JUEGO":
         dibujar_timer(pantalla, segundos, fuente_timer)
         dibujar_reset(pantalla, icono_reset)
@@ -266,12 +349,30 @@ while corriendo:  # BUCLE PRINCIPAL
         if pregunta_actual:
             dibujar_pregunta(pantalla, pregunta_actual["pregunta"], fuente_pregunta)
             botones_respuesta = dibujar_respuestas(pantalla, respuestas_actuales, fuente_boton)
+
+            # DIBUJAR COMODINES: recorre la lista nombres_comodines
             espacio = 40
-            ancho_total = img_comodin_5050.get_width() + img_comodin_cambiar.get_width() + espacio
+            ancho_comodin = img_comodin_5050.get_width()
+            alto_comodin = img_comodin_5050.get_height()
+            ancho_total = ancho_comodin * 3 + espacio * 2  # 3 imágenes + 2 espacios
             x_inicial = (ANCHO_PANTALLA - ancho_total) // 2
-            y_comodin = ALTO_PANTALLA - img_comodin_5050.get_height() - 20
-            rect_5050 = pantalla.blit(img_comodin_5050, (x_inicial, y_comodin))
-            rect_cambiar = pantalla.blit(img_comodin_cambiar, (x_inicial + img_comodin_5050.get_width() + espacio, y_comodin))
+            y_comodin = ALTO_PANTALLA - alto_comodin - 20
+            
+            # 50/50
+            x_5050 = x_inicial
+            rect_5050 = pygame.Rect(x_5050, y_comodin, ancho_comodin, alto_comodin)
+            pantalla.blit(img_comodin_5050, rect_5050)
+            
+            # CAMBIAR
+            x_cambiar = x_inicial + ancho_comodin + espacio
+            rect_cambiar = pygame.Rect(x_cambiar, y_comodin, ancho_comodin, alto_comodin)
+            pantalla.blit(img_comodin_cambiar, rect_cambiar)
+
+            # PAUSAR TIEMPO
+            x_pausa = x_inicial + (ancho_comodin + espacio) * 2
+            rect_pausa = pygame.Rect(x_pausa, y_comodin, ancho_comodin, alto_comodin)
+            pantalla.blit(img_comodin_pausar_el_tiempo, rect_pausa)
+            
         dibujar_boton(pantalla, pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40), "VOLVER", fuente_boton)
 
     elif pantalla_actual == "JUEGO_TERMINADO":
@@ -302,10 +403,10 @@ while corriendo:  # BUCLE PRINCIPAL
 
 
     elif pantalla_actual == "PUNTAJES":
+        ordenar_diccionarios(lista_puntajes, "puntaje", True)  # Ordena la lista de diccionarios por puntaje de manera descendente.
         dibujar_titulo(pantalla, "PUNTAJES", fuente_titulo, ANCHO_PANTALLA)
         dibujar_tabla_puntajes(pantalla, lista_puntajes, fuente_boton)
         dibujar_boton_volver(pantalla, fuente_boton)
-
     if musica_activa:
         pantalla.blit(icono_sonido_on, rect_icono_sonido)
     else:

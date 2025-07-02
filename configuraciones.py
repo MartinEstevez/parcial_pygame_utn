@@ -29,6 +29,7 @@ RUTA_IMAGEN_FONDO_CONFIG = "img\\fondo_config.png"
 RUTA_IMAGEN_FONDO_PUNTAJES = "img\\fondo_puntajes.png"
 RUTA_IMAGEN_COMODIN_50_50 = "img\\comodin_50_50.png"
 RUTA_IMAGEN_COMODIN_CAMBIAR = "img\\comodin_cambiar.png"
+RUTA_IMAGEN_COMODIN_PAUSAR_EL_TIEMPO = "img\\comodin_llamada.PNG"
 
 # TÍTULO
 TITULO_JUEGO = "¿Quién quiere ser millonario?"

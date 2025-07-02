@@ -254,27 +254,40 @@ def formatear_alumnos(lista_diccionarios:list[dict]) -> str:
     return retorno
 
 
-def actualizar_ranking(nombre:str, nuevo_puntaje:int, ruta:str) -> None:
+def actualizar_ranking(nombre:str, nuevo_puntaje:int, tiempo:int, ruta:str) -> None:
     """
-    Actualiza el ranking guardando solo el mejor puntaje de cada jugador.
+    Actualiza el ranking guardando solo el mejor puntaje de cada jugador y el menor tiempo asociado a ese puntaje.
     """
+    # datos_csv = leer_archivo(ruta)
+    
+    # if datos_csv == None:
+    #     lista_ranking = []
+    #     nuevo_jugador = {"nombre": nombre, "puntaje": str(nuevo_puntaje), "tiempo": str(tiempo)}
+    #     lista_ranking.append(nuevo_jugador)
+    # else:
+    #     lista_ranking = cargar_datos(datos_csv)
+    #     ordenar_diccionarios(lista_ranking, "puntaje", True) # Ordena la lista de diccionarios por puntaje de manera descendente.
+    
+    # datos_actualizados = formatear_alumnos(lista_ranking)
+    # guardar_archivo(ruta, "w", datos_actualizados)
+
     datos_csv = leer_archivo(ruta)
 
-    if datos_csv is None or datos_csv.strip() == "":
+    if datos_csv is None or datos_csv.strip() == "":   # Verifica si el archivo está vacío o no existe.
         lista_ranking = []
     else:
         lista_ranking = cargar_datos(datos_csv)
-    
-    encontrado = False # busca si existe el jugador 
-    for jugador in lista_ranking:
-        if jugador["nombre"] == nombre:
-            encontrado = True
-            if int(jugador["puntaje"]) < nuevo_puntaje:
-                jugador["puntaje"] = str(nuevo_puntaje)
-            break
+        encontrado = False
+        for jugador in lista_ranking:
+            if jugador["nombre"] == nombre:
+                encontrado = True
+                if int(jugador["puntaje"]) < nuevo_puntaje: #
+                    jugador["puntaje"] = str(nuevo_puntaje)
+                    jugador["tiempo"] = str(tiempo)
+                break
 
     if not encontrado:
-        nuevo_jugador = {"nombre": nombre, "puntaje": str(nuevo_puntaje)}
+        nuevo_jugador = {"nombre": nombre, "puntaje": str(nuevo_puntaje), "tiempo": str(tiempo)}
         lista_ranking.append(nuevo_jugador)
 
     datos_actualizados = formatear_alumnos(lista_ranking)
