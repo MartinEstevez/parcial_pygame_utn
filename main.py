@@ -248,7 +248,7 @@ while corriendo:  # BUCLE PRINCIPAL
 
     # LÓGICA DEL JUEGO
     if esperando_respuesta:
-        if pygame.time.get_ticks() - tiempo_pausa >= 0000:  # 2000 ms = 2 segundos
+        if pygame.time.get_ticks() - tiempo_pausa >= 0000:  # 5000 ms = 5 segundos
             esperando_respuesta = False
             pausa = False  # <-- REANUDA el timer después de responder, incluso si venía de comodín
             pygame.mixer.music.unpause()  # <-- Reanuda la música principal

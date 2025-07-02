@@ -3,32 +3,30 @@ import random
 
 # Función para leer un archivo .json
 def leer_archivo_json(ruta:str) -> list[dict]:
-    """
-    Esta función se encarga de leer un archivo .json() y devuelve su contenido.
+    """Lee un archivo JSON y devuelve su contenido.
 
-    Recibe:
-        - ruta (str): ruta del archivo que se va a leer.
+    Args:
+        ruta (str): Ruta del archivo JSON a leer.
 
-    Devuelve:
-        - lista_contenido (list[dict]): contenido del archivo.
+    Returns:
+        list[dict]: Contenido del archivo JSON.
     """
-    # Abrimos el archivo, indicando la ruta y el modo de apertura, en este caso es "r" (read / lectura).
+    # Abrimos el archivo, indicando la ruta y el modo de apertura, "r" lectura.
     with open(ruta, "r") as archivo:
         lista_contenido = json.load(archivo) 
 
     return lista_contenido
 
 def crear_lista_indices_random(cantidad_indices:int, minimo:int, maximo:int) -> list:
-    """
-    Crea una lista de índices de manera aleatoria.
+    """Crea una lista de índices de manera aleatoria.
 
-    Recibe:
-        - cantidad_indices (int): cantidad de índices que va a contener la lista.
-        - minimo (int): número mínimo límite que puede ser el índice.
-        - maximo (int): número máximo límite que puede ser el índice.
+    Args:
+        cantidad_indices (int): Cantidad de índices a generar.
+        minimo (int): Valor mínimo del rango de índices.
+        maximo (int): Valor máximo del rango de índices.
 
-    Devuelve:
-        - lista_indices (list): lista de índices aleatorios.
+    Returns:
+        list: Lista de índices aleatorios.
     """
 
     lista_indices = []
@@ -65,21 +63,20 @@ def verificar_repeticion(lista:list, numero:int) -> bool:
     return repetido
 
 def mostrar_pregunta(diccionario:dict, clave:str) -> None:
-    """ 
-    Muestra las preguntas de cada diccionario dentro de la lista, de manera aleatoria.
+    """Muestra la pregunta correspondiente a la clave en el diccionario.
 
-    Recibe:
-        - diccionario (dict): lista de diccionarios, donde se encuentran las preguntas a mostrar.
-        - clave (str): clave a utilizar en cada diccionario.
+    Args:
+        diccionario (dict): Diccionario que contiene la pregunta.
+        clave (str): Clave que se utilizará para acceder a la pregunta.
     """
+    
     print(diccionario[clave])
 
 def mostrar_respuestas_aleatorias(diccionario:dict) -> None:
-    """
-    Muestra las respuestas de cada diccionario.
+    """Muestra respuestas aleatorias del diccionario.
 
-    Recibe:
-        - diccionario (dict): diccionario de donde se van a mostrar las respuestas.
+    Args:
+        diccionario (dict): Diccionario que contiene las respuestas.
     """
     indices = crear_lista_indices_random(4, 1, 4)
 
@@ -110,8 +107,14 @@ def comprobar_respuesta(diccionario:dict, respuesta:str, clave:str) -> bool:
 # ------------------------------------------- COMODINES -------------------------------------------
 # COMODÍN DE OCULTAR RESPUESTAS
 def ocultar_respuestas(diccionario:dict, clave:str) -> list:
-    """
-    Comodín de ocultar dos respuestas incorrectas aleatoriamente.
+    """Comodín de ocultar dos respuestas incorrectas aleatoriamente.
+
+    Args:
+        diccionario (dict): Diccionario que contiene las respuestas.
+        clave (str): Clave que se utilizará para acceder a la respuesta correcta.
+
+    Returns:
+        list: Lista de respuestas ocultas.
     """
     lista_indices = crear_lista_indices_random(4, 1, 4)
     respuestas_filtradas = []
@@ -130,30 +133,16 @@ def ocultar_respuestas(diccionario:dict, clave:str) -> list:
 
     return respuestas_filtradas
 
-# COMODÍN DE CAMBIAR PREGUNTA
-def cambiar_pregunta(lista_diccionarios:list[dict], lista_indices:list, minimo:int, maximo:int) -> dict:
-    """
-    Comodín de cambio de pregunta.
-    """
-    nuevo_indice = random.randint(minimo, maximo)
-    while verificar_repeticion(lista_indices, nuevo_indice) == True:
-        nuevo_indice = random.randint(minimo, maximo)
-
-    nueva_pregunta = lista_diccionarios[nuevo_indice]
-    return nueva_pregunta                
-
-#COMODIN LLAMAR UN AMIGO
-def llamar_amigo(diccionario:dict, clave:str) -> dict:
-    return
-    
-    
-    
-
 #------------- FUNCIONES NICOLÁS -------------------------------------------
 
 def leer_archivo(ruta:str) -> str | None:
-    """
-    
+    """Lee el contenido de un archivo.
+
+    Args:
+        ruta (str): Ruta del archivo a leer.
+
+    Returns:
+        str | None: Contenido del archivo o None si ocurre un error.
     """
     try: 
         with open(ruta, "r") as archivo:
@@ -168,7 +157,10 @@ def leer_archivo(ruta:str) -> str | None:
 
 
 def mostrar_lista_diccionarios(lista_diccionarios:list[dict]) -> None:
-    """
+    """Muestra una lista de diccionarios en formato tabla.
+
+    Args:
+        lista_diccionarios (list[dict]): Lista de diccionarios a mostrar.
     """
     espacios_reservados = medir_clave_mas_larga(lista_diccionarios[0].keys()) + 5
     # espacios_reservados = 12
@@ -186,8 +178,11 @@ def mostrar_lista_diccionarios(lista_diccionarios:list[dict]) -> None:
                 print(f"{lista_diccionarios[i][clave]:<{espacios_reservados}}")
 
 def imprimir_encabezado(claves_diccionario:list, espacios_reservados:int) -> None:
-    """
+    """Imprime el encabezado de la tabla.
 
+    Args:
+        claves_diccionario (list): Lista de claves del diccionario.
+        espacios_reservados (int): Espacios reservados para cada columna.
     """
     contador = 0
     for clave in claves_diccionario:
@@ -202,7 +197,13 @@ def imprimir_encabezado(claves_diccionario:list, espacios_reservados:int) -> Non
 
 
 def medir_clave_mas_larga(claves_diccionario:list) -> int:
-    """
+    """Mide la longitud de la clave más larga en un diccionario.
+
+    Args:
+        claves_diccionario (list): Lista de claves del diccionario.
+
+    Returns:
+        int: Longitud de la clave más larga.
     """
     clave_mas_larga = None
 
@@ -218,8 +219,13 @@ def medir_clave_mas_larga(claves_diccionario:list) -> int:
     return clave_mas_larga
 
 def cargar_datos(datos:str) -> list[dict]:
-    """
-    Modifica el texto del CSV en una lista de diccionarios (uno por jugador).
+    """Carga los datos de un string en una lista de diccionarios.
+
+    Args:
+        datos (str): Datos en formato CSV.
+
+    Returns:
+        list[dict]: Lista de diccionarios con los datos.
     """
     print(datos)
     lista_retorno = []
@@ -242,8 +248,13 @@ def cargar_datos(datos:str) -> list[dict]:
     return lista_retorno
 
 def formatear_alumnos(lista_diccionarios:list[dict]) -> str:
-    """
-    Modifica la lista de jugadores en un string csv para guardarlo.
+    """Formatea la lista de diccionarios en un string CSV.
+
+    Args:
+        lista_diccionarios (list[dict]): Lista de diccionarios a formatear.
+
+    Returns:
+        str: Datos en formato CSV.
     """
     retorno = ""
     
@@ -255,22 +266,14 @@ def formatear_alumnos(lista_diccionarios:list[dict]) -> str:
 
 
 def actualizar_ranking(nombre:str, nuevo_puntaje:int, tiempo:int, ruta:str) -> None:
-    """
-    Actualiza el ranking guardando solo el mejor puntaje de cada jugador y el menor tiempo asociado a ese puntaje.
-    """
-    # datos_csv = leer_archivo(ruta)
-    
-    # if datos_csv == None:
-    #     lista_ranking = []
-    #     nuevo_jugador = {"nombre": nombre, "puntaje": str(nuevo_puntaje), "tiempo": str(tiempo)}
-    #     lista_ranking.append(nuevo_jugador)
-    # else:
-    #     lista_ranking = cargar_datos(datos_csv)
-    #     ordenar_diccionarios(lista_ranking, "puntaje", True) # Ordena la lista de diccionarios por puntaje de manera descendente.
-    
-    # datos_actualizados = formatear_alumnos(lista_ranking)
-    # guardar_archivo(ruta, "w", datos_actualizados)
+    """Actualiza el ranking de jugadores.
 
+    Args:
+        nombre (str): Nombre del jugador.
+        nuevo_puntaje (int): Nuevo puntaje del jugador.
+        tiempo (int): Tiempo del jugador.
+        ruta (str): Ruta del archivo CSV.
+    """
     datos_csv = leer_archivo(ruta)
 
     if datos_csv is None or datos_csv.strip() == "":   # Verifica si el archivo está vacío o no existe.
@@ -295,15 +298,23 @@ def actualizar_ranking(nombre:str, nuevo_puntaje:int, tiempo:int, ruta:str) -> N
 
 
 def guardar_archivo(ruta:str, modo:str, datos:str) -> None:
-    """
-    Guarda el archivo
+    """Guarda el archivo.
+
+    Args:
+        ruta (str): Ruta del archivo.
+        modo (str): Modo de apertura del archivo.
+        datos (str): Datos a guardar en el archivo.
     """
     with open(ruta, modo) as archivo:
         archivo.write(datos)
 
 def ordenar_diccionarios(lista_diccionarios:list[dict], clave:str, descendente:str = False):
-    """
-    Ordena una lista de diccionarios, por la clave y criterio.
+    """Ordena una lista de diccionarios por una clave específica.
+
+    Args:
+        lista_diccionarios (list[dict]): Lista de diccionarios a ordenar.
+        clave (str): Clave por la cual se ordenará la lista.
+        descendente (str, optional): Indica si el orden es descendente. Por defecto es False (ascendente).
     """
     for i in range(len(lista_diccionarios) - 1):
         for j in range(i + 1, len(lista_diccionarios)):
@@ -312,9 +323,15 @@ def ordenar_diccionarios(lista_diccionarios:list[dict], clave:str, descendente:s
                 lista_diccionarios[i] = lista_diccionarios[j]
                 lista_diccionarios[j] = aux
 
-#def calcular_puntaje(contador: int, tiempo_respuesta: float) -> int:
-
 def obtener_respuestas(pregunta: dict) -> list:
+    """Obtiene las respuestas de una pregunta.
+
+    Args:
+        pregunta (dict): Pregunta de la cual se obtendrán las respuestas.
+
+    Returns:
+        list: Lista de respuestas aleatorias.
+    """
     indices = crear_lista_indices_random(4, 1, 4)
     respuestas = []
     for i in range(len(indices)):
@@ -322,22 +339,16 @@ def obtener_respuestas(pregunta: dict) -> list:
     return respuestas
 
 def calcular_puntaje(segundos:int , puntaje_base:int) -> int:
-    """
-    Calcula el puntaje basado en el tiempo de respuesta y el puntaje base.
-    
-    Recibe:
-        - segundos (int): tiempo de respuesta en segundos.
-        - puntaje_base (int): puntaje base del juego.
-        - puntaje_base (int): puntaje base del juego.
+    """Calcula el puntaje basado en el tiempo de respuesta y el puntaje base.
 
-    Devuelve:
-        - puntaje (int): puntaje calculado.
-    """
+    Args:
+        segundos (int): Tiempo de respuesta en segundos.
+        puntaje_base (int): Puntaje base del juego.
 
+    Returns:
+        int: Puntaje calculado.
+    """
     puntaje_total = None
-
-    
-
     if segundos == 0:
         puntaje_total = puntaje_base
     else:
