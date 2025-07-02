@@ -237,6 +237,7 @@ def dibujar_tabla_puntajes(pantalla: pygame.Surface, puntajes: list[dict], fuent
         pantalla (pygame.Surface): La superficie donde se dibujará la tabla.
         puntajes (list[dict]): La lista de diccionarios con los puntajes.
         fuente (pygame.font.Font): La fuente a utilizar para el texto.
+        cantidad_mostrar (int): La cantidad de puntajes a mostrar en la tabla.
     """
     encabezados = ["Nombre", "Puntaje"]
     x_inicial = ANCHO_PANTALLA * 0.2
