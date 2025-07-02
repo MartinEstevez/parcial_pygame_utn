@@ -13,7 +13,7 @@ def dibujar_boton(pantalla: pygame.Surface, rect_boton: pygame.Rect, texto: str,
 def dibujar_titulo(pantalla: pygame.Surface, texto: str, fuente: pygame.font.Font, ancho_pantalla: int):
     titulo_render = fuente.render(texto, True, COLOR_TEXTO)
     x_titulo = (ancho_pantalla - titulo_render.get_width()) / 2
-    pantalla.blit(titulo_render, (x_titulo, 120))
+    pantalla.blit(titulo_render, (x_titulo, 60))
 
 def dibujar_botones_menu(pantalla: pygame.Surface, textos: list, fuente: pygame.font.Font, y_inicial: int, ancho_boton: int, alto_boton: int, espacio: int, ancho_pantalla: int):
     botones = []
@@ -84,7 +84,11 @@ def dibujar_reset(pantalla: pygame.Surface, icono_reset: pygame.Surface):
     pantalla.blit(icono_reset, pygame.Rect(x_img, y_img, ancho_img, alto_img))
 
 def dibujar_boton_volver(pantalla: pygame.Surface, fuente: pygame.font.Font):
-    rect_volver = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
+    ancho_boton = int(ANCHO_PANTALLA * 0.18)
+    alto_boton = int(ALTO_PANTALLA * 0.07)
+    x = ANCHO_PANTALLA - ancho_boton - int(ANCHO_PANTALLA * 0.02)
+    y = ALTO_PANTALLA - alto_boton - int(ALTO_PANTALLA * 0.12)
+    rect_volver = pygame.Rect(x, y, ancho_boton, alto_boton)
     dibujar_boton(pantalla, rect_volver, "VOLVER", fuente)
     return rect_volver
 
@@ -106,21 +110,26 @@ def dibujar_fondo_por_pantalla(pantalla: pygame.Surface, pantalla_actual: str):
     fondo = pygame.transform.scale(pygame.image.load(ruta), (ANCHO_PANTALLA, ALTO_PANTALLA))
     pantalla.blit(fondo, (0, 0))
 
-def dibujar_comodines(pantalla: pygame.Surface, nombres: list, fuente: pygame.font.Font) -> list[pygame.Rect]:
+def dibujar_comodines(pantalla: pygame.Surface, imagenes:int):
     """
-    Dibuja los botones de comodines centrados abajo y devuelve sus rectángulos.
+    Dibuja los comodines (imágenes) centrados abajo y devuelve una lista de sus rectángulos.
     """
     botones = []
-    ancho_total = (ANCHO_BOTON * len(nombres)) + ESPACIO_ENTRE_BOTONES * (len(nombres) - 1)
-    x_inicial = (ANCHO_PANTALLA - ancho_total) / 2
-    y = ALTO_PANTALLA - 120
+    cantidad = len(imagenes)
+    if cantidad == 0:
+        return botones
+    ancho = imagenes[0].get_width()
+    alto = imagenes[0].get_height()
+    espacio = 40
+    ancho_total = ancho * cantidad + espacio * (cantidad - 1)
+    x_inicial = (ANCHO_PANTALLA - ancho_total) // 2
+    y = ALTO_PANTALLA - alto - 20
 
-    for i in range(len(nombres)):
-        x = x_inicial + i * (ANCHO_BOTON + ESPACIO_ENTRE_BOTONES)
-        rect = pygame.Rect(x, y, ANCHO_BOTON, ALTO_BOTON)
-        dibujar_boton(pantalla, rect, nombres[i], fuente)
+    for i in range(cantidad):
+        x = x_inicial + i * (ancho + espacio)
+        rect = pygame.Rect(x, y, ancho, alto)
+        pantalla.blit(imagenes[i], rect)
         botones.append(rect)
-
     return botones
 
 def leer_puntajes_csv(ruta_csv: str) -> list[dict]:
@@ -134,7 +143,7 @@ def leer_puntajes_csv(ruta_csv: str) -> list[dict]:
 def dibujar_tabla_puntajes(pantalla: pygame.Surface, puntajes: list[dict], fuente: pygame.font.Font):
     encabezados = ["Nombre", "Puntaje"]
     x_inicial = ANCHO_PANTALLA * 0.2
-    y_inicial = ALTO_PANTALLA * 0.50
+    y_inicial = ALTO_PANTALLA * 0.22
     ancho_columna = ANCHO_PANTALLA * 0.3
     alto_fila = ALTO_PANTALLA * 0.06
     espacio = ALTO_PANTALLA * 0.01
@@ -171,5 +180,30 @@ def dibujar_tabla_puntajes(pantalla: pygame.Surface, puntajes: list[dict], fuent
         texto_puntaje = fuente.render(jugador["puntaje"], True, color_texto_puntaje)
         pantalla.blit(texto_puntaje, texto_puntaje.get_rect(center=rect_puntaje.center))
 
+def dibujar_marcadores(pantalla, puntaje_total, respuestas_correctas, preguntas_respondidas, fuente, color_fondo, color_texto):
+    """
+    Dibuja los marcadores de puntaje y porcentaje en la esquina inferior izquierda,
+    con un rectángulo de fondo sencillo.
+    """
+    marcador_puntaje = fuente.render(f"PUNTAJE = {puntaje_total}", True, color_texto)
+    if preguntas_respondidas > 0:
+        porcentaje = int((respuestas_correctas / preguntas_respondidas) * 100)
+    else:
+        porcentaje = 0
+    marcador_porcentaje = fuente.render(f"% CORRECTAS = {porcentaje} %", True, color_texto)
 
+    x = int(pantalla.get_width() * 0.02)
+    y = int(pantalla.get_height() * 0.82)
+
+    # Calcula el ancho y alto del rectángulo según los textos
+    ancho = max(marcador_puntaje.get_width(), marcador_porcentaje.get_width()) + 5
+    alto = marcador_puntaje.get_height() + marcador_porcentaje.get_height() + 5
+
+    # Dibuja el rectángulo de fondo
+    pygame.draw.rect(pantalla, color_fondo, (x - 5, y - 5, ancho, alto))
+    pygame.draw.rect(pantalla, (180, 180, 180), (x - 5, y - 5, ancho, alto), 2)
+
+    # Dibuja los textos encima
+    pantalla.blit(marcador_puntaje, (x, y))
+    pantalla.blit(marcador_porcentaje, (x, y + marcador_puntaje.get_height()))
 

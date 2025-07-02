@@ -11,12 +11,12 @@ pygame.display.set_caption(TITULO_JUEGO)
 pygame.display.set_icon(pygame.image.load(RUTA_FAVICON))
 
 # FUENTES
-fuente_titulo = pygame.font.SysFont("timesnewroman", TAM_FUENTE_TITULO)
-fuente_boton = pygame.font.SysFont("timesnewroman", TAM_FUENTE_BOTON)
-fuente_marcadores = pygame.font.SysFont('timesnewroman', TAM_FUENTE_MARCADORES)
+fuente_titulo = pygame.font.SysFont("Impact", TAM_FUENTE_TITULO)
+fuente_boton = pygame.font.SysFont("OpenSans", TAM_FUENTE_BOTON)
+fuente_marcadores = pygame.font.SysFont('Opensans', TAM_FUENTE_MARCADORES)
 fuente_des = pygame.font.SysFont("timesnewroman", TAM_FUENTE_DES)
 fuente_timer = pygame.font.SysFont("timesnewroman", TAM_FUENTE_TIMER)
-fuente_pregunta = pygame.font.SysFont("timesnewroman", TAM_FUENTE_PREGUNTA)
+fuente_pregunta = pygame.font.SysFont("Roboto", TAM_FUENTE_PREGUNTA)
 
 # ICONOS
 icono_sonido_on = pygame.transform.scale(pygame.image.load(RUTA_ICONO_SONIDO_ON), (40, 40))
@@ -27,12 +27,14 @@ img_comodin_5050 = pygame.image.load(RUTA_IMAGEN_COMODIN_50_50)
 img_comodin_cambiar = pygame.image.load(RUTA_IMAGEN_COMODIN_CAMBIAR)
 img_comodin_pausar_el_tiempo = pygame.image.load(RUTA_IMAGEN_COMODIN_PAUSAR_EL_TIEMPO)
 
-img_comodin_5050 = pygame.transform.smoothscale(img_comodin_5050, (100, 140))
-img_comodin_cambiar = pygame.transform.smoothscale(img_comodin_cambiar, (100, 140))
-img_comodin_pausar_el_tiempo = pygame.transform.smoothscale(img_comodin_pausar_el_tiempo, (100, 140))
+img_comodin_5050 = pygame.transform.smoothscale(img_comodin_5050, (70, 110))
+img_comodin_cambiar = pygame.transform.smoothscale(img_comodin_cambiar, (70, 110))
+img_comodin_pausar_el_tiempo = pygame.transform.smoothscale(img_comodin_pausar_el_tiempo, (70, 110))
+
 
 # MÚSICA
 pygame.mixer.music.load(RUTA_MUSICA_MENU)
+sonido_pausar = pygame.mixer.Sound(RUTA_MUSICA_COMODIN)
 pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(0.5)
 
@@ -144,8 +146,8 @@ while corriendo:  # BUCLE PRINCIPAL
                             pantalla_actual = "CONFIGURACIÓN"
 
             elif pantalla_actual == "PUNTAJES":
-                volver_rect = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
-                if volver_rect.collidepoint(mouse_pos):
+                rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
+                if rect_volver.collidepoint(mouse_pos):
                     pantalla_actual = "MENU"
 
             elif pantalla_actual == "CONFIGURACIÓN":
@@ -158,68 +160,45 @@ while corriendo:  # BUCLE PRINCIPAL
                         pass
 
                 # Detectar clic en el botón VOLVER (esquina inferior derecha)
-                volver_rect = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
-                if volver_rect.collidepoint(mouse_pos):
+                rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
+                if rect_volver.collidepoint(mouse_pos):
                     pantalla_actual = "MENU"
 
             elif pantalla_actual == "EN_JUEGO":
                 if not esperando_respuesta:
-                    volver_rect = pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40)
-                    if volver_rect.collidepoint(mouse_pos):
+                    rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
+                    if rect_volver.collidepoint(mouse_pos):
                         pantalla_actual = "MENU"
                     if pygame.Rect(10, 10, 45, 45).collidepoint(mouse_pos):
                         segundos = 0
                     # --- Comodines ---
-                    espacio = 40
-                    ancho_comodin = img_comodin_5050.get_width()
-                    alto_comodin = img_comodin_5050.get_height()
-                    ancho_total = ancho_comodin * 3 + espacio * 2
-                    x_inicial = (ANCHO_PANTALLA - ancho_total) // 2
-                    y_comodin = ALTO_PANTALLA - alto_comodin - 20
-
-
-                    # 50/50
-                    x_5050 = x_inicial
-                    rect_5050 = pygame.Rect(x_5050, y_comodin, ancho_comodin, alto_comodin)
-                    if rect_5050 and rect_5050.collidepoint(mouse_pos) and not comodin_5050_usado and not comodin_usado:
-                        # Lógica del comodín 50/50
-                        respuestas_a_mostrar = [respuesta_correcta]
-                        # Agrega una incorrecta aleatoria
-                        incorrectas = [r for r in respuestas_actuales if r != respuesta_correcta]
-                        if incorrectas:
-                            import random
-                            respuestas_a_mostrar.append(random.choice(incorrectas))
-                        # Mezcla las dos respuestas a mostrar
-                        random.shuffle(respuestas_a_mostrar)
-                        respuestas_actuales = respuestas_a_mostrar
-                        comodin_5050_usado = True
-                        comodin_usado = True
-
-                    # CAMBIAR
-                    x_cambiar = x_inicial + ancho_comodin + espacio
-                    rect_cambiar = pygame.Rect(x_cambiar, y_comodin, ancho_comodin, alto_comodin)
-                    if rect_cambiar and rect_cambiar.collidepoint(mouse_pos) and not comodin_cambiar_usado and not comodin_usado:
-                        # Cambiar la pregunta actual
-                        preguntas_respondidas += 1
-                        if preguntas_respondidas < 10:
-                            pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
-                            respuestas_actuales = obtener_respuestas(pregunta_actual)
-                            respuesta_correcta = (lambda d, c: d[c])(pregunta_actual, "correcta")
-                            segundos = 0
-                            comodin_cambiar_usado = True
-                            comodin_usado = True
-                        else:
-                            pantalla_actual = "JUEGO_TERMINADO"
-                            pantalla_pide_nombre = True
-
-                    # PAUSAR TIEMPO
-                    x_pausa = x_inicial + (ancho_comodin + espacio) * 2 
-                    rect_pausa = pygame.Rect(x_pausa, y_comodin, ancho_comodin, alto_comodin)
-                    if rect_pausa and rect_pausa.collidepoint(mouse_pos) and not comodin_pausar_usado and not comodin_usado:# se usa el comodín de pausar
-                        # Pausar el tiempo
-                        comodin_pausar_usado = True #activa el comodín de pausar el tiempo
-                        comodin_usado = True #  bandera para controlar si se usó un comodín
-                        pausa = True  # Pausa el timer
+                    for i in range(len(botones_comodines)):
+                        if botones_comodines[i].collidepoint(mouse_pos):
+                            if i == 0 and comodin_5050_usado == False and comodin_usado == False:
+                                # Lógica 50/50
+                                respuestas_actuales = ocultar_respuestas(pregunta_actual, "correcta")
+                                comodin_5050_usado = True
+                                comodin_usado = True
+                            elif i == 1 and comodin_cambiar_usado == False and comodin_usado == False:
+                                # Lógica cambiar pregunta
+                                preguntas_respondidas += 1
+                                if preguntas_respondidas < 10:
+                                    pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
+                                    respuestas_actuales = obtener_respuestas(pregunta_actual)
+                                    respuesta_correcta = (lambda d, c: d[c])(pregunta_actual, "correcta")
+                                    segundos = 0
+                                    comodin_cambiar_usado = True
+                                    comodin_usado = True
+                                else:
+                                    pantalla_actual = "JUEGO_TERMINADO"
+                                    pantalla_pide_nombre = True
+                            elif i == 2 and comodin_pausar_usado == False and comodin_usado == False:
+                                # Lógica pausar tiempo
+                                pygame.mixer.music.pause()
+                                sonido_pausar.play()
+                                comodin_pausar_usado = True
+                                comodin_usado = True
+                                pausa = True
 
                     for i in range(len(botones_respuesta)):
                         if botones_respuesta[i].collidepoint(mouse_pos):
@@ -272,6 +251,7 @@ while corriendo:  # BUCLE PRINCIPAL
         if pygame.time.get_ticks() - tiempo_pausa >= 0000:  # 2000 ms = 2 segundos
             esperando_respuesta = False
             pausa = False  # <-- REANUDA el timer después de responder, incluso si venía de comodín
+            pygame.mixer.music.unpause()  # <-- Reanuda la música principal
             if preguntas_respondidas < 10:
                 pregunta_actual = lista_preguntas[indices_preguntas[preguntas_respondidas]]
                 respuestas_actuales = obtener_respuestas(pregunta_actual)
@@ -301,7 +281,7 @@ while corriendo:  # BUCLE PRINCIPAL
 
             dibujar_timer(pantalla, segundos, fuente_timer)
             dibujar_reset(pantalla, icono_reset)
-            dibujar_boton(pantalla, pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40), "VOLVER", fuente_boton)
+            rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
             pantalla.blit(icono_sonido_on if musica_activa else icono_sonido_off, rect_icono_sonido)
             pygame.display.update()
             continue  # Saltar el resto del bucle para evitar interacción
@@ -315,65 +295,29 @@ while corriendo:  # BUCLE PRINCIPAL
             texto = fuente_des.render(desarrolladores[i], True, COLOR_TEXTO)
             pantalla.blit(texto, (10, ALTO_PANTALLA - 120 + i * 30))
 
+        # -------------- VERSION ------------
+        texto_version = fuente_des.render("v2.0", True, COLOR_TEXTO)
+        x_version = ANCHO_PANTALLA - texto_version.get_width() - 15
+        y_version = ALTO_PANTALLA - texto_version.get_height() - 15
+        pantalla.blit(texto_version, (x_version, y_version))
+
     elif pantalla_actual == "CONFIGURACIÓN":
         dibujar_titulo(pantalla, "CONFIGURACIÓN", fuente_titulo, ANCHO_PANTALLA)
         dibujar_botones_menu(pantalla, botones_configuracion, fuente_boton, Y_BOTONES, ANCHO_BOTON, ALTO_BOTON, ESPACIO_ENTRE_BOTONES, ANCHO_PANTALLA)
         # Botón VOLVER en la pantalla de configuración
-        dibujar_boton(pantalla, pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40), "VOLVER", fuente_boton)
+        rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
     
     elif pantalla_actual == "EN_JUEGO":
         dibujar_timer(pantalla, segundos, fuente_timer)
         dibujar_reset(pantalla, icono_reset)
-        # Marcadores compactos en la esquina inferior izquierda
-        marcador_puntaje = fuente_marcadores.render(f"PUNTAJE = {puntaje_total}", True, COLOR_TEXTO)
-        if preguntas_respondidas > 0:
-            porcentaje = int((respuestas_correctas / preguntas_respondidas) * 100)
-        else:
-            porcentaje = 0
-        marcador_porcentaje = fuente_marcadores.render(f"% CORRECTAS = {porcentaje} %", True, COLOR_TEXTO)
-
-        # Posiciones y tamaño compacto
-        margen_x = 15
-        margen_y = 15
-        padding = 10
-        espacio_textos = 5
-        rect_ancho = max(marcador_puntaje.get_width(), marcador_porcentaje.get_width()) + 2 * padding
-        rect_alto = marcador_puntaje.get_height() + marcador_porcentaje.get_height() + espacio_textos + 2 * padding
-
-        rect = pygame.Rect(margen_x, ALTO_PANTALLA - rect_alto - margen_y, rect_ancho, rect_alto)
-        pygame.draw.rect(pantalla, COLOR_FONDO_BOTON, rect)
-        pygame.draw.rect(pantalla, (180, 180, 180), rect, 2)
-
-        pantalla.blit(marcador_puntaje, (rect.x + padding, rect.y + padding))
-        pantalla.blit(marcador_porcentaje, (rect.x + padding, rect.y + padding + marcador_puntaje.get_height() + espacio_textos))
+        dibujar_marcadores(pantalla, puntaje_total, respuestas_correctas, preguntas_respondidas, fuente_marcadores, COLOR_FONDO_BOTON, COLOR_TEXTO)        
         if pregunta_actual:
             dibujar_pregunta(pantalla, pregunta_actual["pregunta"], fuente_pregunta)
             botones_respuesta = dibujar_respuestas(pantalla, respuestas_actuales, fuente_boton)
-
-            # DIBUJAR COMODINES: recorre la lista nombres_comodines
-            espacio = 40
-            ancho_comodin = img_comodin_5050.get_width()
-            alto_comodin = img_comodin_5050.get_height()
-            ancho_total = ancho_comodin * 3 + espacio * 2  # 3 imágenes + 2 espacios
-            x_inicial = (ANCHO_PANTALLA - ancho_total) // 2
-            y_comodin = ALTO_PANTALLA - alto_comodin - 20
+            imagenes_comodines = [img_comodin_5050, img_comodin_cambiar, img_comodin_pausar_el_tiempo]
+            botones_comodines = dibujar_comodines(pantalla, imagenes_comodines)
             
-            # 50/50
-            x_5050 = x_inicial
-            rect_5050 = pygame.Rect(x_5050, y_comodin, ancho_comodin, alto_comodin)
-            pantalla.blit(img_comodin_5050, rect_5050)
-            
-            # CAMBIAR
-            x_cambiar = x_inicial + ancho_comodin + espacio
-            rect_cambiar = pygame.Rect(x_cambiar, y_comodin, ancho_comodin, alto_comodin)
-            pantalla.blit(img_comodin_cambiar, rect_cambiar)
-
-            # PAUSAR TIEMPO
-            x_pausa = x_inicial + (ancho_comodin + espacio) * 2
-            rect_pausa = pygame.Rect(x_pausa, y_comodin, ancho_comodin, alto_comodin)
-            pantalla.blit(img_comodin_pausar_el_tiempo, rect_pausa)
-            
-        dibujar_boton(pantalla, pygame.Rect(ANCHO_PANTALLA - 170, ALTO_PANTALLA - 60, 150, 40), "VOLVER", fuente_boton)
+        rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
 
     elif pantalla_actual == "JUEGO_TERMINADO":
         dibujar_titulo(pantalla, "JUEGO TERMINADO", fuente_titulo, ANCHO_PANTALLA)
