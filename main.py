@@ -126,6 +126,7 @@ while corriendo:  # BUCLE PRINCIPAL
                             corriendo = False
 
                         elif botones_menu[i] == "JUGAR":
+                            usar_comodin = True
                             pantalla_actual = "EN_JUEGO"
                             segundos = 0
                             respuestas_correctas = 0
@@ -340,7 +341,8 @@ while corriendo:  # BUCLE PRINCIPAL
             dibujar_pregunta(pantalla, pregunta_actual["pregunta"], fuente_pregunta)
             botones_respuesta = dibujar_respuestas(pantalla, respuestas_actuales, fuente_boton)
             imagenes_comodines = [img_comodin_5050, img_comodin_cambiar, img_comodin_pausar_el_tiempo]
-            botones_comodines = dibujar_comodines(pantalla, imagenes_comodines)
+            if comodin_usado == False:
+                botones_comodines = dibujar_comodines(pantalla, imagenes_comodines)            
             
         rect_volver = dibujar_boton_volver(pantalla, fuente_boton)
 
@@ -374,7 +376,7 @@ while corriendo:  # BUCLE PRINCIPAL
     elif pantalla_actual == "PUNTAJES":
         ordenar_diccionarios(lista_puntajes, "puntaje", True)  # Ordena la lista de diccionarios por puntaje de manera descendente.
         dibujar_titulo(pantalla, "PUNTAJES", fuente_titulo, ANCHO_PANTALLA)
-        dibujar_tabla_puntajes(pantalla, lista_puntajes, fuente_boton)
+        dibujar_tabla_puntajes(pantalla, lista_puntajes, fuente_boton, 10)
         dibujar_boton_volver(pantalla, fuente_boton)
     if musica_activa:
         pantalla.blit(icono_sonido_on, rect_icono_sonido)

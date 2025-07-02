@@ -230,13 +230,14 @@ def leer_puntajes_csv(ruta_csv: str) -> list[dict]:
         lector = csv.DictReader(archivo)
         return list(lector)
 
-def dibujar_tabla_puntajes(pantalla: pygame.Surface, puntajes: list[dict], fuente: pygame.font.Font):
+def dibujar_tabla_puntajes(pantalla: pygame.Surface, puntajes: list[dict], fuente: pygame.font.Font, cantidad_mostrar:int):
     """Dibuja una tabla de puntajes en la pantalla.
 
     Args:
         pantalla (pygame.Surface): La superficie donde se dibujará la tabla.
         puntajes (list[dict]): La lista de diccionarios con los puntajes.
         fuente (pygame.font.Font): La fuente a utilizar para el texto.
+        cantidad_mostrar (int): La cantidad de puntajes a mostrar en la tabla.
     """
     encabezados = ["Nombre", "Puntaje"]
     x_inicial = ANCHO_PANTALLA * 0.2
@@ -263,7 +264,7 @@ def dibujar_tabla_puntajes(pantalla: pygame.Surface, puntajes: list[dict], fuent
         pantalla.blit(texto, texto.get_rect(center=rect.center))
 
     # Filas de puntajes
-    for fila in range(len(puntajes)):
+    for fila in range(cantidad_mostrar):
         y = y_inicial + (fila + 1) * (alto_fila + espacio)
         jugador = puntajes[fila]
         # Nombre
