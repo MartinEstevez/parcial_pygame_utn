@@ -374,7 +374,7 @@ while corriendo:  # BUCLE PRINCIPAL
     elif pantalla_actual == "PUNTAJES":
         ordenar_diccionarios(lista_puntajes, "puntaje", True)  # Ordena la lista de diccionarios por puntaje de manera descendente.
         dibujar_titulo(pantalla, "PUNTAJES", fuente_titulo, ANCHO_PANTALLA)
-        dibujar_tabla_puntajes(pantalla, lista_puntajes, fuente_boton)
+        dibujar_tabla_puntajes(pantalla, lista_puntajes, fuente_boton, 10)
         dibujar_boton_volver(pantalla, fuente_boton)
     if musica_activa:
         pantalla.blit(icono_sonido_on, rect_icono_sonido)
