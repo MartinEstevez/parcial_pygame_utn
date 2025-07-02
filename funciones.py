@@ -5,17 +5,50 @@ import csv
 ruta_csv = "puntajes.csv"
 
 def dibujar_boton(pantalla: pygame.Surface, rect_boton: pygame.Rect, texto: str, fuente: pygame.font.Font, color_fondo=COLOR_FONDO_BOTON, color_texto=COLOR_TEXTO):
+    """Dibuja un botón en la pantalla.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujará el botón.
+        rect_boton (pygame.Rect): El rectángulo que define la posición y tamaño del botón.
+        texto (str): El texto a mostrar en el botón.
+        fuente (pygame.font.Font): La fuente a utilizar para el texto.
+        color_fondo (tuple, optional): El color de fondo del botón. Defaults to COLOR_FONDO_BOTON.
+        color_texto (tuple, optional): El color del texto. Defaults to COLOR_TEXTO.
+    """
     pygame.draw.rect(pantalla, color_fondo, rect_boton)
     texto_render = fuente.render(texto, True, color_texto)
     rect_texto = texto_render.get_rect(center=rect_boton.center)
     pantalla.blit(texto_render, rect_texto)
 
 def dibujar_titulo(pantalla: pygame.Surface, texto: str, fuente: pygame.font.Font, ancho_pantalla: int):
+    """Dibuja un título en la pantalla.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujará el título.
+        texto (str): El texto del título.
+        fuente (pygame.font.Font): La fuente a utilizar para el texto.
+        ancho_pantalla (int): El ancho de la pantalla.
+    """
     titulo_render = fuente.render(texto, True, COLOR_TEXTO)
     x_titulo = (ancho_pantalla - titulo_render.get_width()) / 2
     pantalla.blit(titulo_render, (x_titulo, 60))
 
 def dibujar_botones_menu(pantalla: pygame.Surface, textos: list, fuente: pygame.font.Font, y_inicial: int, ancho_boton: int, alto_boton: int, espacio: int, ancho_pantalla: int):
+    """Dibuja los botones del menú en la pantalla.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujarán los botones.
+        textos (list): La lista de textos para los botones.
+        fuente (pygame.font.Font): La fuente a utilizar para el texto.
+        y_inicial (int): La posición vertical inicial para los botones.
+        ancho_boton (int): El ancho de los botones.
+        alto_boton (int): La altura de los botones.
+        espacio (int): El espacio entre los botones.
+        ancho_pantalla (int): El ancho de la pantalla.
+
+    Returns:
+        list: La lista de rectángulos de los botones dibujados.
+    """
     botones = []
     for i in range(len(textos)):
         x = (ancho_pantalla - ancho_boton) / 2
@@ -26,7 +59,16 @@ def dibujar_botones_menu(pantalla: pygame.Surface, textos: list, fuente: pygame.
     return botones
 
 def dibujar_respuestas(pantalla: pygame.Surface, respuestas: list, fuente: pygame.font.Font):
+    """Dibuja los botones de respuesta en la pantalla.
 
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujarán los botones.
+        respuestas (list): La lista de respuestas a mostrar.
+        fuente (pygame.font.Font): La fuente a utilizar para el texto.
+
+    Returns:
+        list: La lista de rectángulos de los botones dibujados.
+    """
     espacio_vertical = ALTO_PANTALLA * 0.05
     botones = []
 
@@ -45,6 +87,14 @@ def dibujar_respuestas(pantalla: pygame.Surface, respuestas: list, fuente: pygam
     return botones
 
 def dibujar_timer(pantalla: pygame.Surface, segundos: int, fuente: pygame.font.Font):
+    """Dibuja un temporizador en la pantalla.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujará el temporizador.
+        segundos (int): El tiempo en segundos a mostrar.
+        fuente (pygame.font.Font): La fuente a utilizar para el texto.
+    """
+    
     min = segundos // 60
     seg = segundos % 60
     texto_timer = fuente.render(f"{min:02}:{seg:02}", True, COLOR_TEXTO)
@@ -55,6 +105,13 @@ def dibujar_timer(pantalla: pygame.Surface, segundos: int, fuente: pygame.font.F
     pantalla.blit(texto_timer, rect_texto)
 
 def dibujar_pregunta(pantalla: pygame.Surface, texto: str, fuente: pygame.font.Font):
+    """Dibuja una pregunta en la pantalla.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujará la pregunta.
+        texto (str): El texto de la pregunta.
+        fuente (pygame.font.Font): La fuente a utilizar para el texto.
+    """
     x = ANCHO_PANTALLA * 0.125
     y = ALTO_PANTALLA * 0.167
     ancho = ANCHO_PANTALLA * 0.75
@@ -67,6 +124,15 @@ def dibujar_pregunta(pantalla: pygame.Surface, texto: str, fuente: pygame.font.F
     pantalla.blit(texto_render, texto_render.get_rect(center=rect_pregunta.center))
 
 def dibujar_reset(pantalla: pygame.Surface, icono_reset: pygame.Surface):
+    """Dibuja el botón de reinicio en la pantalla.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujará el botón de reinicio.
+        icono_reset (pygame.Surface): El ícono que se mostrará en el botón de reinicio.
+
+    Returns:
+        pygame.Rect: El rectángulo que define la posición y tamaño del botón de reinicio.
+    """
     ancho = ANCHO_PANTALLA * 0.056
     alto = ALTO_PANTALLA * 0.075
     x = ANCHO_PANTALLA * 0.012
@@ -85,6 +151,15 @@ def dibujar_reset(pantalla: pygame.Surface, icono_reset: pygame.Surface):
     return rect_reset
 
 def dibujar_boton_volver(pantalla: pygame.Surface, fuente: pygame.font.Font):
+    """Dibuja el botón de volver en la pantalla.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujará el botón de volver.
+        fuente (pygame.font.Font): La fuente a utilizar para el texto.
+
+    Returns:
+        rect_volver: El rectángulo que define la posición y tamaño del botón de volver.
+    """
     ancho_boton = int(ANCHO_PANTALLA * 0.18)
     alto_boton = int(ALTO_PANTALLA * 0.07)
     x = ANCHO_PANTALLA - ancho_boton - int(ANCHO_PANTALLA * 0.02)
@@ -94,8 +169,11 @@ def dibujar_boton_volver(pantalla: pygame.Surface, fuente: pygame.font.Font):
     return rect_volver
 
 def dibujar_fondo_por_pantalla(pantalla: pygame.Surface, pantalla_actual: str):
-    """
-    Carga y dibuja el fondo correspondiente a la pantalla actual.
+    """Dibuja el fondo correspondiente a la pantalla actual.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujará el fondo.
+        pantalla_actual (str): El estado actual de la pantalla.
     """
     if pantalla_actual == "EN_JUEGO":
         ruta = RUTA_IMAGEN_FONDO_JUEGO
@@ -111,9 +189,15 @@ def dibujar_fondo_por_pantalla(pantalla: pygame.Surface, pantalla_actual: str):
     fondo = pygame.transform.scale(pygame.image.load(ruta), (ANCHO_PANTALLA, ALTO_PANTALLA))
     pantalla.blit(fondo, (0, 0))
 
-def dibujar_comodines(pantalla: pygame.Surface, imagenes:int):
-    """
-    Dibuja los comodines (imágenes) centrados abajo y devuelve una lista de sus rectángulos.
+def dibujar_comodines(pantalla: pygame.Surface, imagenes: list[pygame.Surface]):
+    """Dibuja los comodines (imágenes) centrados abajo y devuelve una lista de sus rectángulos.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujarán los comodines.
+        imagenes (int): Lista de imágenes de los comodines.
+
+    Returns:
+        botones: Lista de rectángulos que representan los botones de los comodines.
     """
     botones = []
     cantidad = len(imagenes)
@@ -134,14 +218,26 @@ def dibujar_comodines(pantalla: pygame.Surface, imagenes:int):
     return botones
 
 def leer_puntajes_csv(ruta_csv: str) -> list[dict]:
-    """
-    Lee un archivo CSV de puntajes y devuelve una lista de diccionarios.
+    """Lee un archivo CSV de puntajes y devuelve una lista de diccionarios.
+
+    Args:
+        ruta_csv (str): La ruta del archivo CSV a leer.
+
+    Returns:
+        list[dict]: Una lista de diccionarios con los puntajes leídos del CSV.
     """
     with open(ruta_csv, newline='', encoding='utf-8') as archivo:
         lector = csv.DictReader(archivo)
         return list(lector)
 
 def dibujar_tabla_puntajes(pantalla: pygame.Surface, puntajes: list[dict], fuente: pygame.font.Font):
+    """Dibuja una tabla de puntajes en la pantalla.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujará la tabla.
+        puntajes (list[dict]): La lista de diccionarios con los puntajes.
+        fuente (pygame.font.Font): La fuente a utilizar para el texto.
+    """
     encabezados = ["Nombre", "Puntaje"]
     x_inicial = ANCHO_PANTALLA * 0.2
     y_inicial = ALTO_PANTALLA * 0.22
@@ -182,9 +278,16 @@ def dibujar_tabla_puntajes(pantalla: pygame.Surface, puntajes: list[dict], fuent
         pantalla.blit(texto_puntaje, texto_puntaje.get_rect(center=rect_puntaje.center))
 
 def dibujar_marcadores(pantalla: pygame.Surface, puntaje_total: int, respuestas_correctas: int, preguntas_respondidas: int, fuente: pygame.font.Font, color_fondo: tuple, color_texto: tuple):
-    """
-    Dibuja los marcadores de puntaje y porcentaje en la esquina inferior izquierda,
-    con un rectángulo de fondo sencillo.
+    """Dibuja los marcadores de puntaje y porcentaje en la esquina inferior izquierda,con un rectángulo de fondo sencillo.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujarán los marcadores.
+        puntaje_total (int): El puntaje total del jugador.
+        respuestas_correctas (int): La cantidad de respuestas correctas.
+        preguntas_respondidas (int): La cantidad de preguntas respondidas.
+        fuente (pygame.font.Font): La fuente a utilizar para el texto.
+        color_fondo (tuple): El color de fondo del rectángulo.
+        color_texto (tuple): El color del texto.
     """
     marcador_puntaje = fuente.render(f"PUNTAJE = {puntaje_total}", True, color_texto)
     if preguntas_respondidas > 0:
